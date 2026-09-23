@@ -6,11 +6,13 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\LandingSettingsController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/dashboard');
+Route::get('/', LandingController::class)->name('landing');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -47,6 +49,9 @@ Route::middleware('auth')->group(function () {
         Route::delete('/users/{user}', [AdminUserController::class, 'destroy'])->name('users.destroy');
         Route::get('/settings', [SettingController::class, 'edit'])->name('settings');
         Route::put('/settings', [SettingController::class, 'update'])->name('settings.update');
+        Route::get('/landing-settings', [LandingSettingsController::class, 'edit'])->name('landing-settings');
+        Route::put('/landing-settings', [LandingSettingsController::class, 'update'])->name('landing-settings.update');
+        Route::post('/landing-settings/photo', [LandingSettingsController::class, 'uploadPhoto'])->name('landing-settings.photo');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs');
     });
 });

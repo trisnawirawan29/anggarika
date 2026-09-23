@@ -3,6 +3,33 @@
 @section('page-title', 'Pengaturan Aplikasi')
 @section('page-subtitle', 'Sesuaikan identitas dan tampilan aplikasi Anda.')
 @section('content')
+<style>
+    .application-settings-section .section-title {
+        cursor: pointer;
+    }
+
+    .application-section-toggle {
+        margin-left: auto;
+        border: 0;
+        background: #f4f3ff;
+        color: #6c63ff;
+        border-radius: 8px;
+        width: 32px;
+        height: 32px;
+    }
+
+    .application-settings-tabs .nav-link {
+        color: #6c63ff;
+        background: #f4f3ff;
+        border: 0;
+        border-radius: 8px;
+    }
+
+    .application-settings-tabs .nav-link.active {
+        color: #fff;
+        background: #6c63ff;
+    }
+</style>
 <div class="settings-shell">
     @if (session('success'))<div class="alert alert-success small">{{ session('success') }}</div>@endif
     @if ($errors->any())<div class="alert alert-danger small">{{ $errors->first() }}</div>@endif
@@ -16,5 +43,75 @@
         </div>
     </form>
 </div>
-<script>const bindColor=(picker,input,preview)=>{const p=document.getElementById(picker),i=document.getElementById(input),v=document.getElementById(preview),paint=color=>{if(v)v.style.backgroundColor=color},sync=()=>{if(/^#[0-9a-f]{6}$/i.test(i.value)){p.value=i.value;paint(i.value)}};p?.addEventListener('input',()=>{i.value=p.value;paint(p.value)});i?.addEventListener('input',sync);sync()};bindColor('primary-picker','primary-color','primary-preview');bindColor('sidebar-picker','sidebar-color','sidebar-preview');bindColor('navbar-picker','navbar-color','navbar-preview');bindColor('footer-picker','footer-color','footer-preview');</script>
+<script>
+    (() => {
+        const form = document.querySelector('form[action="{{ route('admin.settings.update') }}"]');
+        const cards = [...(form?.querySelectorAll('.content-card') || [])];
+        if (!form || !cards.length) {
+            return;
+        }
+
+        const tabs = document.createElement('div');
+        tabs.className = 'application-settings-tabs nav nav-pills flex-wrap gap-2 mb-4';
+        form.querySelector('.row.g-4')?.prepend(tabs);
+
+        const activateTab = (activeIndex) => {
+            cards.forEach((card, index) => {
+                card.closest('.col-12').hidden = index !== activeIndex;
+                tabs.children[index]?.classList.toggle('active', index === activeIndex);
+                tabs.children[index]?.setAttribute('aria-selected', String(index === activeIndex));
+            });
+        };
+
+        cards.forEach((card, index) => {
+            const heading = card.querySelector('.section-title');
+            if (!heading) {
+                return;
+            }
+
+            const tab = document.createElement('button');
+            tab.type = 'button';
+            tab.className = 'nav-link';
+            tab.textContent = heading.querySelector('h5')?.textContent.trim() || `Section ${index + 1}`;
+            tab.setAttribute('aria-selected', 'false');
+            tab.addEventListener('click', () => activateTab(index));
+            tabs.appendChild(tab);
+
+            const saveButton = document.createElement('button');
+            saveButton.type = 'submit';
+            saveButton.className = 'btn btn-primary mt-4';
+            saveButton.innerHTML = '<i class="fas fa-check me-2"></i>Simpan section ini';
+            card.appendChild(saveButton);
+        });
+
+        activateTab(0);
+    })();
+
+    const bindColor = (picker, input, preview) => {
+        const pickerElement = document.getElementById(picker);
+        const inputElement = document.getElementById(input);
+        const previewElement = document.getElementById(preview);
+        const paint = (color) => {
+            if (previewElement) {
+                previewElement.style.backgroundColor = color;
+            }
+        };
+        const sync = () => {
+            if (/^#[0-9a-f]{6}$/i.test(inputElement.value)) {
+                pickerElement.value = inputElement.value;
+                paint(inputElement.value);
+            }
+        };
+        pickerElement?.addEventListener('input', () => {
+            inputElement.value = pickerElement.value;
+            paint(pickerElement.value);
+        });
+        inputElement?.addEventListener('input', sync);
+        sync();
+    };
+    bindColor('primary-picker', 'primary-color', 'primary-preview');
+    bindColor('sidebar-picker', 'sidebar-color', 'sidebar-preview');
+    bindColor('navbar-picker', 'navbar-color', 'navbar-preview');
+    bindColor('footer-picker', 'footer-color', 'footer-preview');
+</script>
 @endsection

@@ -47,6 +47,9 @@
             <ul class="nav sidebar-menu flex-column" role="menu">
                 <li class="nav-item"><a href="{{ route('dashboard') }}" class="nav-link {{ request()->routeIs('dashboard') ? 'active' : '' }}"><i class="nav-icon fas fa-chart-pie"></i><p>Dashboard</p></a></li>
                 <li class="nav-item"><a href="{{ route('notifications') }}" class="nav-link {{ request()->routeIs('notifications*') ? 'active' : '' }}"><i class="nav-icon far fa-bell"></i><p>Notifikasi</p></a></li>
+                @if (auth()->user()->isAdmin())
+                    <li class="nav-item"><a href="{{ route('admin.landing-settings') }}" class="nav-link {{ request()->routeIs('admin.landing-settings*') ? 'active' : '' }}"><i class="nav-icon fas fa-images"></i><p>Pengaturan Landing Page</p></a></li>
+                @endif
             </ul>
             <div class="nav-header mt-3">AKUN</div>
             <ul class="nav sidebar-menu flex-column" role="menu">
