@@ -160,8 +160,8 @@
                                 </div>
                                 <div class="couple-text">
                                     <div class="couple-content">
-                                        <h4>{{ $landing['landing_groom_name'] }}</h4>
-                                        <p>{{ $landing['landing_groom_bio'] }}</p>
+                                        <h4 style="font-size: {{ (int) $landing['landing_groom_name_font_size'] }}px;{{ $landing['landing_groom_name_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_groom_name_font_family'].';' : '' }}">{{ $landing['landing_groom_name'] }}</h4>
+                                        <p style="white-space: pre-line;">{{ $landing['landing_groom_bio'] }}</p>
                                     </div>
                                     <div class="social-icon">
                                         <ul>
@@ -182,8 +182,8 @@
                                 </div>
                                 <div class="couple-text">
                                     <div class="couple-content">
-                                        <h4>{{ $landing['landing_bride_name'] }}</h4>
-                                        <p>{{ $landing['landing_bride_bio'] }}</p>
+                                        <h4 style="font-size: {{ (int) $landing['landing_bride_name_font_size'] }}px;{{ $landing['landing_bride_name_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_bride_name_font_family'].';' : '' }}">{{ $landing['landing_bride_name'] }}</h4>
+                                        <p style="white-space: pre-line;">{{ $landing['landing_bride_bio'] }}</p>
                                     </div>
                                     <div class="social-icon">
                                         <ul>
@@ -882,15 +882,27 @@
         </footer>
         <!-- end site-footer -->
         @endif
-        @if ($landing['landing_section_music'])
+        @if ($landing['landing_section_music'] && $landing['landing_music_file'] !== '')
         <!-- strat music-box -->
         <div class="music-box">
             <button class="music-box-toggle-btn">
                 <i class="ti-music-alt"></i>
             </button>
             <div class="music-holder">
-                <iframe src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/102137206&amp;auto_play=true&amp;hide_related=false&amp;show_comments=true&amp;show_user=true&amp;show_reposts=false&amp;visual=true"></iframe>
+                <audio id="landing-music" controls autoplay loop preload="auto" src="{{ $landing['landing_music_file'] }}"></audio>
             </div>
+            <script>
+                (() => {
+                    const music = document.getElementById('landing-music');
+                    if (!music) {
+                        return;
+                    }
+
+                    music.play().catch(() => {
+                        document.addEventListener('click', () => music.play().catch(() => {}), {once: true});
+                    });
+                })();
+            </script>
         </div>
         <!-- end music box -->
         @endif

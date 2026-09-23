@@ -20,6 +20,10 @@ class LandingController extends Controller
             'landing_bride_bio' => 'Hi, I am Aliza Elizabeth. Thank you for being part of our special day.',
             'landing_groom_name' => 'Millar Wiliam',
             'landing_groom_bio' => 'Hi, I am Millar Wiliam. We are delighted to celebrate this moment with you.',
+            'landing_bride_name_font_size' => '32',
+            'landing_bride_name_font_family' => 'inherit',
+            'landing_groom_name_font_size' => '32',
+            'landing_groom_name_font_family' => 'inherit',
             'landing_bride_facebook_url' => '#',
             'landing_bride_twitter_url' => '#',
             'landing_bride_instagram_url' => '#',
@@ -58,6 +62,7 @@ class LandingController extends Controller
             'landing_gallery_title' => 'Our Gallery',
             'landing_rsvp_title' => 'Be Our RSVP',
             'landing_footer_title' => 'Millar & Aliza Forever',
+            'landing_music_file' => '',
         ];
         $sectionDefaults = [
             'landing_section_hero' => true,
@@ -131,6 +136,10 @@ class LandingController extends Controller
                 : asset($settings->get($key, $default))]
         );
         $landing = $landing->merge($photos);
+        $musicFile = (string) $settings->get('landing_music_file', '');
+        $landing['landing_music_file'] = $musicFile === ''
+            ? ''
+            : (str_starts_with($musicFile, 'landing/') ? asset('storage/'.$musicFile) : asset($musicFile));
 
         return view('landing', compact('landing'));
     }

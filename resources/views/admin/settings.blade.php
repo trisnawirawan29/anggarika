@@ -19,6 +19,8 @@
     }
 
     .application-settings-tabs .nav-link {
+        width: 100%;
+        text-align: left;
         color: #6c63ff;
         background: #f4f3ff;
         border: 0;
@@ -28,6 +30,115 @@
     .application-settings-tabs .nav-link.active {
         color: #fff;
         background: #6c63ff;
+    }
+
+    .application-wizard-navigation {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .application-wizard-layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 28px;
+        align-items: start;
+    }
+
+    .application-wizard-sidebar {
+        position: sticky;
+        top: 20px;
+        padding: 18px;
+        background: #fff;
+        border: 1px solid #e9e7f5;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(35, 31, 77, .06);
+    }
+
+    .application-wizard-sidebar::before {
+        display: block;
+        margin-bottom: 14px;
+        color: #25213f;
+        content: 'Langkah pengaturan';
+        font-size: .78rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .application-wizard-content > .col-12 > .content-card {
+        border: 1px solid #e9e7f5;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(35, 31, 77, .06);
+        padding: 24px;
+    }
+
+    .application-settings-tabs .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 13px;
+        font-weight: 600;
+        transition: .2s ease;
+    }
+
+    .application-settings-tabs .nav-link:hover {
+        transform: translateX(3px);
+    }
+
+    .application-settings-tabs .nav-link.active .badge {
+        color: #6c63ff !important;
+        background: #fff !important;
+    }
+
+    .application-wizard-content .section-title {
+        margin-bottom: 24px;
+    }
+
+    [data-bs-theme="dark"] .application-wizard-sidebar,
+    [data-bs-theme="dark"] .application-wizard-content > .col-12 > .content-card {
+        background: #1f2430;
+        border-color: #3b4354;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    }
+
+    [data-bs-theme="dark"] .application-wizard-sidebar::before,
+    [data-bs-theme="dark"] .application-wizard-content .section-title h5 {
+        color: #f1f3f8;
+    }
+
+    [data-bs-theme="dark"] .application-settings-tabs .nav-link {
+        color: #c9c5ff;
+        background: #2b3241;
+    }
+
+    [data-bs-theme="dark"] .application-settings-tabs .nav-link.active {
+        color: #fff;
+        background: #6c63ff;
+    }
+
+    [data-bs-theme="dark"] .application-settings-tabs .nav-link.active .badge {
+        color: #6c63ff !important;
+    }
+
+    @media (max-width: 991px) {
+        .application-wizard-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .application-wizard-sidebar {
+            position: static;
+            padding: 14px;
+        }
+
+        .application-settings-tabs {
+            flex-direction: row !important;
+        }
+
+        .application-settings-tabs .nav-link {
+            width: auto;
+        }
     }
 </style>
 <div class="settings-shell">
@@ -52,8 +163,30 @@
         }
 
         const tabs = document.createElement('div');
-        tabs.className = 'application-settings-tabs nav nav-pills flex-wrap gap-2 mb-4';
-        form.querySelector('.row.g-4')?.prepend(tabs);
+        tabs.className = 'application-settings-tabs nav nav-pills flex-column gap-2';
+
+        const navigation = document.createElement('div');
+        navigation.className = 'application-wizard-navigation';
+        const previousButton = document.createElement('button');
+        previousButton.type = 'button';
+        previousButton.className = 'btn btn-outline-secondary';
+        previousButton.innerHTML = '<i class="fas fa-arrow-left me-2"></i>Kembali';
+        const nextButton = document.createElement('button');
+        nextButton.type = 'button';
+        nextButton.className = 'btn btn-outline-primary';
+        nextButton.innerHTML = 'Lanjut<i class="fas fa-arrow-right ms-2"></i>';
+        navigation.append(previousButton, nextButton);
+        const wizardLayout = document.createElement('div');
+        wizardLayout.className = 'application-wizard-layout';
+        const sidebar = document.createElement('aside');
+        sidebar.className = 'application-wizard-sidebar';
+        const content = document.createElement('div');
+        content.className = 'application-wizard-content';
+        sidebar.appendChild(tabs);
+        content.append(navigation);
+        cards.forEach((card) => content.appendChild(card.closest('.col-12')));
+        wizardLayout.append(sidebar, content);
+        form.prepend(wizardLayout);
 
         const activateTab = (activeIndex) => {
             cards.forEach((card, index) => {
@@ -61,6 +194,8 @@
                 tabs.children[index]?.classList.toggle('active', index === activeIndex);
                 tabs.children[index]?.setAttribute('aria-selected', String(index === activeIndex));
             });
+            previousButton.disabled = activeIndex === 0;
+            nextButton.disabled = activeIndex === cards.length - 1;
         };
 
         cards.forEach((card, index) => {
@@ -72,7 +207,7 @@
             const tab = document.createElement('button');
             tab.type = 'button';
             tab.className = 'nav-link';
-            tab.textContent = heading.querySelector('h5')?.textContent.trim() || `Section ${index + 1}`;
+            tab.innerHTML = `<span class="badge rounded-pill text-bg-light me-1">${index + 1}</span>${heading.querySelector('h5')?.textContent.trim() || `Section ${index + 1}`}`;
             tab.setAttribute('aria-selected', 'false');
             tab.addEventListener('click', () => activateTab(index));
             tabs.appendChild(tab);
@@ -82,6 +217,19 @@
             saveButton.className = 'btn btn-primary mt-4';
             saveButton.innerHTML = '<i class="fas fa-check me-2"></i>Simpan section ini';
             card.appendChild(saveButton);
+        });
+
+        previousButton.addEventListener('click', () => {
+            const activeIndex = cards.findIndex((card) => !card.closest('.col-12').hidden);
+            if (activeIndex > 0) {
+                activateTab(activeIndex - 1);
+            }
+        });
+        nextButton.addEventListener('click', () => {
+            const activeIndex = cards.findIndex((card) => !card.closest('.col-12').hidden);
+            if (activeIndex < cards.length - 1) {
+                activateTab(activeIndex + 1);
+            }
         });
 
         activateTab(0);

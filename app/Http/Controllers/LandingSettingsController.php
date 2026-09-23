@@ -24,6 +24,8 @@ class LandingSettingsController extends Controller
         'landing_countdown_background', 'landing_cta_background', 'landing_cta_gallery_background', 'landing_rsvp_background', 'landing_footer_background',
     ];
 
+    private const LANDING_AUDIO_KEYS = ['landing_music_file'];
+
     public function edit(): View
     {
         $settings = Setting::query()->pluck('value', 'key');
@@ -44,6 +46,10 @@ class LandingSettingsController extends Controller
             'landing_bride_bio' => ['required', 'string', 'max:500'],
             'landing_groom_name' => ['required', 'string', 'max:120'],
             'landing_groom_bio' => ['required', 'string', 'max:500'],
+            'landing_bride_name_font_size' => ['required', 'integer', 'between:16,96'],
+            'landing_bride_name_font_family' => ['required', Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace'])],
+            'landing_groom_name_font_size' => ['required', 'integer', 'between:16,96'],
+            'landing_groom_name_font_family' => ['required', Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace'])],
             'landing_story_title' => ['required', 'string', 'max:120'],
             'landing_cta_title' => ['required', 'string', 'max:120'],
             'landing_cta_text' => ['required', 'string', 'max:1000'],
@@ -85,6 +91,7 @@ class LandingSettingsController extends Controller
             'landing_section_footer' => ['required', 'boolean'],
             'landing_section_music' => ['required', 'boolean'],
             ...array_fill_keys(self::LANDING_PHOTO_KEYS, ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048']),
+            'landing_music_file' => ['nullable', 'file', 'mimes:mp3', 'max:10240'],
         ];
 
         $conditionalFields = [
@@ -151,6 +158,20 @@ class LandingSettingsController extends Controller
             }
         }
 
+        foreach (['bride', 'groom'] as $person) {
+            $rules['landing_'.$person.'_name_font_size'] = [
+                Rule::requiredIf($request->boolean('landing_section_couple')),
+                'nullable',
+                'integer',
+                'between:16,96',
+            ];
+            $rules['landing_'.$person.'_name_font_family'] = [
+                Rule::requiredIf($request->boolean('landing_section_couple')),
+                'nullable',
+                Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace']),
+            ];
+        }
+
         $buttonFields = [
             ['landing_cta', 'landing_cta_rsvp_enabled', 'landing_cta_rsvp_label', 'string', 80],
             ['landing_cta', 'landing_cta_rsvp_enabled', 'landing_cta_rsvp_url', 'string', 2048],
@@ -210,6 +231,21 @@ class LandingSettingsController extends Controller
             $data[$key] = $newPhoto;
         }
 
+        foreach (self::LANDING_AUDIO_KEYS as $key) {
+            if (! $request->hasFile($key)) {
+                unset($data[$key]);
+
+                continue;
+            }
+
+            $oldAudio = Setting::value($key);
+            $newAudio = $request->file($key)->store('landing', 'public');
+            if (is_string($oldAudio) && str_starts_with($oldAudio, 'landing/')) {
+                Storage::disk('public')->delete($oldAudio);
+            }
+            $data[$key] = $newAudio;
+        }
+
         foreach ($data as $key => $value) {
             Setting::updateOrCreate(['key' => $key], ['value' => $value]);
         }
@@ -221,9 +257,13 @@ class LandingSettingsController extends Controller
 
     public function uploadPhoto(Request $request): JsonResponse
     {
+        $key = $request->string('photo_key')->toString();
+        $isAudio = in_array($key, self::LANDING_AUDIO_KEYS, true);
         $data = $request->validate([
-            'photo_key' => ['required', Rule::in(self::LANDING_PHOTO_KEYS)],
-            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'photo_key' => ['required', Rule::in([...self::LANDING_PHOTO_KEYS, ...self::LANDING_AUDIO_KEYS])],
+            'photo' => $isAudio
+                ? ['required', 'file', 'mimes:mp3', 'max:10240']
+                : ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
         ]);
 
         $oldPhoto = Setting::value($data['photo_key']);

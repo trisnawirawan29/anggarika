@@ -51,6 +51,9 @@
     }
 
     .landing-settings-tabs .nav-link {
+        position: relative;
+        width: 100%;
+        text-align: left;
         color: #6c63ff;
         background: #f4f3ff;
         border: 0;
@@ -60,6 +63,116 @@
     .landing-settings-tabs .nav-link.active {
         color: #fff;
         background: #6c63ff;
+    }
+
+    .landing-wizard-navigation {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 1rem;
+    }
+
+    .landing-wizard-layout {
+        display: grid;
+        grid-template-columns: 280px minmax(0, 1fr);
+        gap: 28px;
+        align-items: start;
+    }
+
+    .landing-wizard-sidebar {
+        position: sticky;
+        top: 20px;
+        padding: 18px;
+        background: #fff;
+        border: 1px solid #e9e7f5;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(35, 31, 77, .06);
+    }
+
+    .landing-wizard-sidebar::before {
+        display: block;
+        margin-bottom: 14px;
+        color: #25213f;
+        content: 'Langkah pengaturan';
+        font-size: .78rem;
+        font-weight: 800;
+        letter-spacing: .08em;
+        text-transform: uppercase;
+    }
+
+    .landing-wizard-content > .content-card {
+        border: 1px solid #e9e7f5;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(35, 31, 77, .06);
+        padding: 24px;
+    }
+
+    .landing-settings-tabs .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 11px 13px;
+        font-weight: 600;
+        transition: .2s ease;
+    }
+
+    .landing-settings-tabs .nav-link:hover {
+        transform: translateX(3px);
+    }
+
+    .landing-settings-tabs .nav-link.active .badge {
+        color: #6c63ff !important;
+        background: #fff !important;
+    }
+
+    .landing-wizard-content .section-title {
+        margin-bottom: 24px;
+    }
+
+    [data-bs-theme="dark"] .landing-wizard-sidebar,
+    [data-bs-theme="dark"] .landing-wizard-content > .content-card {
+        background: #1f2430;
+        border-color: #3b4354;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, .2);
+    }
+
+    [data-bs-theme="dark"] .landing-wizard-sidebar::before,
+    [data-bs-theme="dark"] .landing-wizard-content .section-title h5 {
+        color: #f1f3f8;
+    }
+
+    [data-bs-theme="dark"] .landing-settings-tabs .nav-link {
+        color: #c9c5ff;
+        background: #2b3241;
+    }
+
+    [data-bs-theme="dark"] .landing-settings-tabs .nav-link.active {
+        color: #fff;
+        background: #6c63ff;
+    }
+
+    [data-bs-theme="dark"] .landing-settings-tabs .nav-link.active .badge {
+        color: #6c63ff !important;
+    }
+    }
+
+    @media (max-width: 991px) {
+        .landing-wizard-layout {
+            grid-template-columns: 1fr;
+        }
+
+        .landing-wizard-sidebar {
+            position: static;
+            padding: 14px;
+        }
+
+        .landing-settings-tabs {
+            flex-direction: row !important;
+        }
+
+        .landing-settings-tabs .nav-link {
+            width: auto;
+        }
     }
 </style>
 <div class="settings-shell">
@@ -74,7 +187,28 @@
         <div class="content-card mb-4"><div class="section-title"><span class="section-number">02</span><div><h5>Pasangan</h5><p>Profil dan foto kedua mempelai.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_couple" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_couple" name="landing_section_couple" value="1" @checked(old('landing_section_couple', $settings['landing_section_couple'] ?? '1'))><label class="form-check-label" for="landing_section_couple">Tampilkan pasangan</label></div><div class="row g-3"><div class="col-md-4"><label class="form-label">Judul</label><input name="landing_couple_title" class="form-control" value="{{ old('landing_couple_title', $settings['landing_couple_title'] ?? 'Happy Couple') }}" required></div><div class="col-md-4"><label class="form-label">Nama wanita</label><input name="landing_bride_name" class="form-control" value="{{ old('landing_bride_name', $settings['landing_bride_name'] ?? 'Aliza Elizabeth') }}" required></div><div class="col-md-4"><label class="form-label">Nama pria</label><input name="landing_groom_name" class="form-control" value="{{ old('landing_groom_name', $settings['landing_groom_name'] ?? 'Millar Wiliam') }}" required></div><div class="col-md-6"><label class="form-label">Bio wanita</label><textarea name="landing_bride_bio" class="form-control" rows="3" required>{{ old('landing_bride_bio', $settings['landing_bride_bio'] ?? 'Hi, I am Aliza Elizabeth. Thank you for being part of our special day.') }}</textarea></div><div class="col-md-6"><label class="form-label">Bio pria</label><textarea name="landing_groom_bio" class="form-control" rows="3" required>{{ old('landing_groom_bio', $settings['landing_groom_bio'] ?? 'Hi, I am Millar Wiliam. We are delighted to celebrate this moment with you.') }}</textarea></div></div><div class="row g-4 mt-1">@foreach ([$photo('landing_bride_photo', 'Foto wanita', 'assets/images/story/1.jpg'), $photo('landing_groom_photo', 'Foto pria', 'assets/images/story/2.jpg')] as $item)<div class="col-6 col-md-3"><img src="{{ $photoUrl($item) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">{{ $item['label'] }}</label><input type="file" name="{{ $item['key'] }}" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div>@endforeach</div></div>
 
         <div class="content-card mb-4">
-            <div class="section-title"><span class="section-number">02A</span><div><h5>Sosial media pasangan</h5><p>Atur link dan tampil/sembunyi tombol sosial media masing-masing.</p></div></div>
+            <div class="section-title"><span class="section-number">02A</span><div><h5>Tipografi nama pasangan</h5><p>Atur ukuran dan jenis font nama Pria serta Wanita.</p></div></div>
+            <div class="row g-3">
+                @foreach ([['key' => 'groom', 'label' => 'Pria'], ['key' => 'bride', 'label' => 'Wanita']] as $person)
+                    <div class="col-md-6">
+                        <div class="border rounded p-3">
+                            <h6>{{ $person['label'] }}</h6>
+                            <label class="form-label">Ukuran nama (px)</label>
+                            <input type="number" name="landing_{{ $person['key'] }}_name_font_size" class="form-control mb-2" min="16" max="96" value="{{ old('landing_'.$person['key'].'_name_font_size', $settings['landing_'.$person['key'].'_name_font_size'] ?? '32') }}">
+                            <label class="form-label">Jenis font</label>
+                            <select name="landing_{{ $person['key'] }}_name_font_family" class="form-select">
+                                @foreach (['inherit' => 'Mengikuti desain', 'Arial, sans-serif' => 'Arial', 'Georgia, serif' => 'Georgia', 'Trebuchet MS, sans-serif' => 'Trebuchet MS', 'Courier New, monospace' => 'Courier New'] as $fontValue => $fontLabel)
+                                    <option value="{{ $fontValue }}" @selected(old('landing_'.$person['key'].'_name_font_family', $settings['landing_'.$person['key'].'_name_font_family'] ?? 'inherit') === $fontValue)>{{ $fontLabel }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+
+        <div class="content-card mb-4">
+            <div class="section-title"><span class="section-number">02B</span><div><h5>Sosial media pasangan</h5><p>Atur link dan tampil/sembunyi tombol sosial media masing-masing.</p></div></div>
             @foreach ([['key' => 'groom', 'label' => 'Pria'], ['key' => 'bride', 'label' => 'Wanita']] as $person)
                 <h6 class="mt-3">{{ $person['label'] }}</h6>
                 <div class="row g-3">
@@ -187,6 +321,16 @@
 
         @foreach ([['key' => 'gta', 'title' => 'Informasi perjalanan', 'label' => 'Tampilkan informasi perjalanan'], ['key' => 'gift', 'title' => 'Gift registration', 'label' => 'Tampilkan gift registration'], ['key' => 'music', 'title' => 'Music player', 'label' => 'Tampilkan music player']] as $item)<div class="content-card mb-4"><div class="section-title"><span class="section-number">08</span><div><h5>{{ $item['title'] }}</h5><p>Pengaturan section {{ $item['title'] }}.</p></div></div><div class="form-check form-switch"><input type="hidden" name="landing_section_{{ $item['key'] }}" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_{{ $item['key'] }}" name="landing_section_{{ $item['key'] }}" value="1" @checked(old('landing_section_'.$item['key'], $settings['landing_section_'.$item['key']] ?? '1'))><label class="form-check-label" for="landing_section_{{ $item['key'] }}">{{ $item['label'] }}</label></div></div>@endforeach
 
+        <div class="content-card mb-4">
+            <div class="section-title"><span class="section-number">10</span><div><h5>Upload music player</h5><p>Upload musik MP3 yang diputar saat landing page dibuka.</p></div></div>
+            <div class="form-text mb-3">Format MP3, maksimal 10 MB. Fitur pemutaran mengikuti toggle Music player.</div>
+            @if (!empty($settings['landing_music_file']))
+                <audio controls class="w-100 mb-3" src="{{ str_starts_with($settings['landing_music_file'], 'landing/') ? asset('storage/'.$settings['landing_music_file']) : asset($settings['landing_music_file']) }}"></audio>
+            @endif
+            <label class="form-label">File musik MP3</label>
+            <input type="file" name="landing_music_file" class="form-control form-control-sm" accept="audio/mpeg,.mp3" data-max-size="10485760">
+        </div>
+
         <div class="content-card mb-4"><div class="section-title"><span class="section-number">09</span><div><h5>Footer</h5><p>Judul penutup dan background footer.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_footer" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_footer" name="landing_section_footer" value="1" @checked(old('landing_section_footer', $settings['landing_section_footer'] ?? '1'))><label class="form-check-label" for="landing_section_footer">Tampilkan footer</label></div><label class="form-label">Judul footer</label><input name="landing_footer_title" class="form-control mb-3" value="{{ old('landing_footer_title', $settings['landing_footer_title'] ?? 'Millar & Aliza Forever') }}" required><div class="row g-4"><div class="col-6 col-md-3"><img src="{{ $photoUrl($photo('landing_footer_background', 'Background footer', 'assets/images/footer-bg.jpg')) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">Background footer</label><input type="file" name="landing_footer_background" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div></div></div>
 
         <div class="d-flex justify-content-end"><button class="btn btn-primary px-4"><i class="fas fa-check me-2"></i>Simpan pengaturan landing page</button></div>
@@ -195,14 +339,57 @@
 <script>
     (() => {
         const form = document.querySelector('form[action="{{ route('admin.landing-settings.update') }}"]');
-        const cards = [...(form?.querySelectorAll(':scope > .content-card') || [])];
+        let cards = [...(form?.querySelectorAll(':scope > .content-card') || [])];
         if (!form || !cards.length) {
             return;
         }
 
+        const musicCard = cards.find((card) => card.querySelector('.section-title h5')?.textContent.trim() === 'Music player');
+        const musicUploadCard = cards.find((card) => card.querySelector('.section-title h5')?.textContent.trim() === 'Upload music player');
+        if (musicCard && musicUploadCard) {
+            [...musicUploadCard.children]
+                .filter((child) => !child.classList.contains('section-title'))
+                .forEach((child) => musicCard.appendChild(child));
+            musicUploadCard.remove();
+            cards = cards.filter((card) => card !== musicUploadCard);
+        }
+
+        const coupleCard = cards.find((card) => card.querySelector('.section-title h5')?.textContent.trim() === 'Pasangan');
+        const coupleSubCards = cards.filter((card) => ['Tipografi nama pasangan', 'Sosial media pasangan'].includes(card.querySelector('.section-title h5')?.textContent.trim()));
+        if (coupleCard && coupleSubCards.length) {
+            coupleSubCards.forEach((subCard) => {
+                [...subCard.children]
+                    .filter((child) => !child.classList.contains('section-title'))
+                    .forEach((child) => coupleCard.appendChild(child));
+                subCard.remove();
+            });
+            cards = cards.filter((card) => !coupleSubCards.includes(card));
+        }
+
         const tabs = document.createElement('div');
-        tabs.className = 'landing-settings-tabs nav nav-pills flex-wrap gap-2 mb-4';
-        form.prepend(tabs);
+        tabs.className = 'landing-settings-tabs nav nav-pills flex-column gap-2';
+
+        const navigation = document.createElement('div');
+        navigation.className = 'landing-wizard-navigation';
+        const previousButton = document.createElement('button');
+        previousButton.type = 'button';
+        previousButton.className = 'btn btn-outline-secondary';
+        previousButton.innerHTML = '<i class="fas fa-arrow-left me-2"></i>Kembali';
+        const nextButton = document.createElement('button');
+        nextButton.type = 'button';
+        nextButton.className = 'btn btn-outline-primary';
+        nextButton.innerHTML = 'Lanjut<i class="fas fa-arrow-right ms-2"></i>';
+        navigation.append(previousButton, nextButton);
+        const wizardLayout = document.createElement('div');
+        wizardLayout.className = 'landing-wizard-layout';
+        const sidebar = document.createElement('aside');
+        sidebar.className = 'landing-wizard-sidebar';
+        const content = document.createElement('div');
+        content.className = 'landing-wizard-content';
+        sidebar.appendChild(tabs);
+        content.append(navigation, ...cards);
+        wizardLayout.append(sidebar, content);
+        form.prepend(wizardLayout);
 
         const activateTab = (activeIndex) => {
             cards.forEach((card, index) => {
@@ -210,6 +397,8 @@
                 tabs.children[index]?.classList.toggle('active', index === activeIndex);
                 tabs.children[index]?.setAttribute('aria-selected', String(index === activeIndex));
             });
+            previousButton.disabled = activeIndex === 0;
+            nextButton.disabled = activeIndex === cards.length - 1;
         };
 
         cards.forEach((card, index) => {
@@ -221,7 +410,7 @@
             const tab = document.createElement('button');
             tab.type = 'button';
             tab.className = 'nav-link';
-            tab.textContent = heading.querySelector('h5')?.textContent.trim() || `Section ${index + 1}`;
+            tab.innerHTML = `<span class="badge rounded-pill text-bg-light me-1">${index + 1}</span>${heading.querySelector('h5')?.textContent.trim() || `Section ${index + 1}`}`;
             tab.setAttribute('aria-selected', 'false');
             tab.addEventListener('click', () => activateTab(index));
             tabs.appendChild(tab);
@@ -231,6 +420,19 @@
             saveButton.className = 'btn btn-primary mt-4';
             saveButton.innerHTML = '<i class="fas fa-check me-2"></i>Simpan section ini';
             card.appendChild(saveButton);
+        });
+
+        previousButton.addEventListener('click', () => {
+            const activeIndex = cards.findIndex((card) => !card.hidden);
+            if (activeIndex > 0) {
+                activateTab(activeIndex - 1);
+            }
+        });
+        nextButton.addEventListener('click', () => {
+            const activeIndex = cards.findIndex((card) => !card.hidden);
+            if (activeIndex < cards.length - 1) {
+                activateTab(activeIndex + 1);
+            }
         });
 
         activateTab(0);
@@ -346,13 +548,14 @@
             image.src = sourceUrl;
         });
 
-        const maximumFileSize = 2 * 1024 * 1024;
         const validateFileSize = (input) => {
+            const maximumFileSize = Number(input.dataset.maxSize || 2 * 1024 * 1024);
             if (!input.files.length || input.files[0].size <= maximumFileSize) {
                 return true;
             }
 
-            window.alert('Ukuran foto maksimal 2 MB. Silakan pilih foto yang lebih kecil.');
+            const maximumFileSizeInMb = Math.round(maximumFileSize / 1024 / 1024);
+            window.alert(`Ukuran file maksimal ${maximumFileSizeInMb} MB. Silakan pilih file yang lebih kecil.`);
             input.value = '';
             return false;
         };
