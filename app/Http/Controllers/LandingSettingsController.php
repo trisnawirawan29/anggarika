@@ -223,7 +223,44 @@ class LandingSettingsController extends Controller
             }
         }
 
-        $data = $request->validate($rules);
+        $sectionFields = [
+            'hero' => ['landing_section_hero', 'landing_page_title', 'landing_hero_subtitle', 'landing_hero_title', 'landing_hero_date', 'landing_hero_background'],
+            'couple' => [
+                'landing_section_couple', 'landing_couple_title', 'landing_bride_name', 'landing_bride_bio', 'landing_groom_name', 'landing_groom_bio',
+                'landing_bride_photo', 'landing_groom_photo', 'landing_bride_name_font_size', 'landing_bride_name_font_family', 'landing_groom_name_font_size', 'landing_groom_name_font_family',
+                ...array_map(fn (string $network): string => 'landing_bride_'.$network.'_enabled', ['facebook', 'twitter', 'instagram', 'linkedin']),
+                ...array_map(fn (string $network): string => 'landing_bride_'.$network.'_url', ['facebook', 'twitter', 'instagram', 'linkedin']),
+                ...array_map(fn (string $network): string => 'landing_bride_'.$network.'_username', ['facebook', 'twitter', 'instagram', 'linkedin']),
+                ...array_map(fn (string $network): string => 'landing_groom_'.$network.'_enabled', ['facebook', 'twitter', 'instagram', 'linkedin']),
+                ...array_map(fn (string $network): string => 'landing_groom_'.$network.'_url', ['facebook', 'twitter', 'instagram', 'linkedin']),
+                ...array_map(fn (string $network): string => 'landing_groom_'.$network.'_username', ['facebook', 'twitter', 'instagram', 'linkedin']),
+            ],
+            'countdown' => ['landing_section_countdown', 'landing_countdown_date', 'landing_countdown_background'],
+            'cta' => ['landing_section_cta', 'landing_cta_title', 'landing_cta_text', 'landing_cta_rsvp_label', 'landing_cta_rsvp_url', 'landing_cta_location_label', 'landing_cta_location_url', 'landing_cta_rsvp_enabled', 'landing_cta_location_enabled', 'landing_cta_background'],
+            'rsvp' => ['landing_section_rsvp', 'landing_rsvp_title', 'landing_rsvp_background'],
+            'story' => ['landing_section_story', 'landing_story_title', ...array_merge(
+                ...array_map(fn (int $number): array => [
+                    'landing_story_'.$number.'_enabled',
+                    'landing_story_'.$number.'_title',
+                    'landing_story_'.$number.'_date',
+                    'landing_story_'.$number.'_text',
+                    'landing_story_photo_'.$number,
+                ], range(1, 4)),
+            )],
+            'event' => ['landing_section_event', 'landing_event_title', ...array_map(fn (int $number): string => 'landing_event_photo_'.$number, range(1, 4))],
+            'people' => ['landing_section_people', 'landing_people_title'],
+            'cta_gallery' => ['landing_section_cta_gallery', 'landing_cta_gallery_title', 'landing_cta_gallery_text', 'landing_cta_gallery_rsvp_label', 'landing_cta_gallery_rsvp_url', 'landing_cta_gallery_location_label', 'landing_cta_gallery_location_url', 'landing_cta_gallery_rsvp_enabled', 'landing_cta_gallery_location_enabled', 'landing_cta_gallery_background'],
+            'gallery' => ['landing_section_gallery', 'landing_gallery_title', ...array_map(fn (int $number): string => 'landing_gallery_photo_'.$number, range(1, 6))],
+            'gta' => ['landing_section_gta'],
+            'gift' => ['landing_section_gift'],
+            'music' => ['landing_section_music', 'landing_music_file'],
+            'footer' => ['landing_section_footer', 'landing_footer_title', 'landing_footer_background'],
+        ];
+
+        $section = $request->validate([
+            'save_section' => ['required', Rule::in(array_keys($sectionFields))],
+        ])['save_section'];
+        $data = $request->validate(array_intersect_key($rules, array_flip($sectionFields[$section])));
 
         foreach (self::LANDING_PHOTO_KEYS as $key) {
             if (! $request->hasFile($key)) {

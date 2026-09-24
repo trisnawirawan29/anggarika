@@ -181,6 +181,7 @@
     @if ($errors->any())<div class="alert alert-danger small">{{ $errors->first() }}</div>@endif
     <form method="POST" action="{{ route('admin.landing-settings.update') }}" enctype="multipart/form-data">
         @csrf @method('PUT')
+        <input type="hidden" name="save_section" value="">
 
         <div class="content-card mb-4"><div class="section-title"><span class="section-number">01</span><div><h5>Hero</h5><p>Judul halaman, teks pembuka, dan foto utama.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_hero" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_hero" name="landing_section_hero" value="1" @checked(old('landing_section_hero', $settings['landing_section_hero'] ?? '1'))><label class="form-check-label" for="landing_section_hero">Tampilkan hero</label></div><div class="row g-3"><div class="col-md-6"><label class="form-label">Judul halaman/aplikasi</label><input name="landing_page_title" class="form-control" value="{{ old('landing_page_title', $settings['landing_page_title'] ?? 'Millar & Aliza · Wedding Invitation') }}" required></div><div class="col-md-6"><label class="form-label">Subjudul hero</label><input name="landing_hero_subtitle" class="form-control" value="{{ old('landing_hero_subtitle', $settings['landing_hero_subtitle'] ?? 'WERE GETTING MARRIED') }}" required></div><div class="col-md-6"><label class="form-label">Judul hero</label><input name="landing_hero_title" class="form-control" value="{{ old('landing_hero_title', $settings['landing_hero_title'] ?? 'Save Our Date') }}" required></div><div class="col-md-6"><label class="form-label">Tanggal hero</label><input name="landing_hero_date" class="form-control" value="{{ old('landing_hero_date', $settings['landing_hero_date'] ?? '25 December 2019') }}" required></div></div><div class="row g-4 mt-1"><div class="col-6 col-md-3"><img src="{{ $photoUrl($photo('landing_hero_background', 'Background hero', 'assets/images/slider/slide-4.jpg')) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">Background hero</label><input type="file" name="landing_hero_background" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div></div></div>
 
@@ -337,7 +338,6 @@
 
         <div class="content-card mb-4"><div class="section-title"><span class="section-number">09</span><div><h5>Footer</h5><p>Judul penutup dan background footer.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_footer" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_footer" name="landing_section_footer" value="1" @checked(old('landing_section_footer', $settings['landing_section_footer'] ?? '1'))><label class="form-check-label" for="landing_section_footer">Tampilkan footer</label></div><label class="form-label">Judul footer</label><input name="landing_footer_title" class="form-control mb-3" value="{{ old('landing_footer_title', $settings['landing_footer_title'] ?? 'Millar & Aliza Forever') }}" required><div class="row g-4"><div class="col-6 col-md-3"><img src="{{ $photoUrl($photo('landing_footer_background', 'Background footer', 'assets/images/footer-bg.jpg')) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">Background footer</label><input type="file" name="landing_footer_background" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div></div></div>
 
-        <div class="d-flex justify-content-end"><button class="btn btn-primary px-4"><i class="fas fa-check me-2"></i>Simpan pengaturan landing page</button></div>
     </form>
 </div>
 <script>
@@ -423,6 +423,29 @@
             saveButton.type = 'submit';
             saveButton.className = 'btn btn-primary mt-4';
             saveButton.innerHTML = '<i class="fas fa-check me-2"></i>Simpan section ini';
+            const sectionNames = {
+                'Hero': 'hero',
+                'Pasangan': 'couple',
+                'Countdown': 'countdown',
+                'CTA': 'cta',
+                'RSVP': 'rsvp',
+                'Cerita': 'story',
+                'Acara': 'event',
+                'Keluarga & teman': 'people',
+                'CTA sebelum galeri': 'cta_gallery',
+                'Galeri': 'gallery',
+                'Informasi perjalanan': 'gta',
+                'Gift registration': 'gift',
+                'Music player': 'music',
+                'Footer': 'footer',
+            };
+            saveButton.dataset.section = sectionNames[heading.querySelector('h5')?.textContent.trim()] || '';
+            saveButton.addEventListener('click', () => {
+                form.querySelector('input[name="save_section"]').value = saveButton.dataset.section;
+                form.querySelectorAll('input[name], textarea[name], select[name]').forEach((field) => {
+                    field.disabled = !['_token', '_method', 'save_section'].includes(field.name) && !card.contains(field);
+                });
+            });
             card.appendChild(saveButton);
         });
 
@@ -570,7 +593,22 @@
                 return;
             }
 
-            const files = [...form.querySelectorAll('input[type="file"]')].filter((input) => input.files.length);
+            const section = form.querySelector('input[name="save_section"]').value;
+            const submitButton = form.querySelector(`button[type="submit"][data-section="${section}"]`);
+            const sectionCard = submitButton?.closest('.content-card');
+            if (!section || !sectionCard) {
+                event.preventDefault();
+                window.alert('Section yang disimpan tidak ditemukan. Silakan muat ulang halaman.');
+                return;
+            }
+
+            form.querySelectorAll('input[name], textarea[name], select[name]').forEach((field) => {
+                if (!['_token', '_method', 'save_section'].includes(field.name) && !sectionCard.contains(field)) {
+                    field.disabled = true;
+                }
+            });
+
+            const files = [...sectionCard.querySelectorAll('input[type="file"]')].filter((input) => input.files.length);
             if (files.some((input) => !validateFileSize(input))) {
                 event.preventDefault();
                 return;
@@ -580,7 +618,6 @@
             }
 
             event.preventDefault();
-            const submitButton = form.querySelector('button[type="submit"]');
             if (submitButton) {
                 submitButton.disabled = true;
                 submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Mengompres dan mengunggah foto...';
@@ -615,7 +652,7 @@
             } catch (error) {
                 if (submitButton) {
                     submitButton.disabled = false;
-                    submitButton.innerHTML = '<i class="fas fa-check me-2"></i>Simpan pengaturan landing page';
+                    submitButton.innerHTML = '<i class="fas fa-check me-2"></i>Simpan section ini';
                 }
                 window.alert(error.message || 'Upload foto gagal.');
             }
