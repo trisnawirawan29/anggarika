@@ -96,59 +96,61 @@ class LandingSettingsController extends Controller
 
         $conditionalFields = [
             'hero' => [
-                'landing_page_title' => ['string', 160],
-                'landing_hero_subtitle' => ['string', 120],
-                'landing_hero_title' => ['string', 120],
-                'landing_hero_date' => ['string', 120],
+                'landing_page_title' => ['type' => 'string', 'max' => 160],
+                'landing_hero_subtitle' => ['type' => 'string', 'max' => 120],
+                'landing_hero_title' => ['type' => 'string', 'max' => 120],
+                'landing_hero_date' => ['type' => 'string', 'max' => 120],
             ],
             'countdown' => [
-                'landing_countdown_date' => ['date_format:Y-m-d\\TH:i', 16],
+                'landing_countdown_date' => ['type' => 'date_format:Y-m-d\\TH:i', 'max' => 16],
             ],
             'couple' => [
-                'landing_couple_title' => ['string', 120],
-                'landing_bride_name' => ['string', 120],
-                'landing_bride_bio' => ['string', 500],
-                'landing_groom_name' => ['string', 120],
-                'landing_groom_bio' => ['string', 500],
+                'landing_couple_title' => ['type' => 'string', 'max' => 120],
+                'landing_bride_name' => ['type' => 'string', 'max' => 120],
+                'landing_bride_bio' => ['type' => 'string', 'max' => 500],
+                'landing_groom_name' => ['type' => 'string', 'max' => 120],
+                'landing_groom_bio' => ['type' => 'string', 'max' => 500],
             ],
             'story' => [
-                'landing_story_title' => ['string', 120],
+                'landing_story_title' => ['type' => 'string', 'max' => 120],
             ],
             'cta' => [
-                'landing_cta_title' => ['string', 120],
-                'landing_cta_text' => ['string', 1000],
-                'landing_cta_rsvp_label' => ['string', 80],
-                'landing_cta_rsvp_url' => ['string', 2048],
-                'landing_cta_location_label' => ['string', 80],
-                'landing_cta_location_url' => ['url', 2048],
+                'landing_cta_title' => ['type' => 'string', 'max' => 120],
+                'landing_cta_text' => ['type' => 'string', 'max' => 1000],
+                'landing_cta_rsvp_label' => ['type' => 'string', 'max' => 80],
+                'landing_cta_rsvp_url' => ['type' => 'string', 'max' => 2048],
+                'landing_cta_location_label' => ['type' => 'string', 'max' => 80],
+                'landing_cta_location_url' => ['type' => 'url', 'max' => 2048],
             ],
             'event' => [
-                'landing_event_title' => ['string', 120],
+                'landing_event_title' => ['type' => 'string', 'max' => 120],
             ],
             'people' => [
-                'landing_people_title' => ['string', 120],
+                'landing_people_title' => ['type' => 'string', 'max' => 120],
             ],
             'gallery' => [
-                'landing_gallery_title' => ['string', 120],
+                'landing_gallery_title' => ['type' => 'string', 'max' => 120],
             ],
             'rsvp' => [
-                'landing_rsvp_title' => ['string', 120],
+                'landing_rsvp_title' => ['type' => 'string', 'max' => 120],
             ],
             'footer' => [
-                'landing_footer_title' => ['string', 120],
+                'landing_footer_title' => ['type' => 'string', 'max' => 120],
             ],
             'cta_gallery' => [
-                'landing_cta_gallery_title' => ['string', 120],
-                'landing_cta_gallery_text' => ['string', 1000],
-                'landing_cta_gallery_rsvp_label' => ['string', 80],
-                'landing_cta_gallery_rsvp_url' => ['string', 2048],
-                'landing_cta_gallery_location_label' => ['string', 80],
-                'landing_cta_gallery_location_url' => ['url', 2048],
+                'landing_cta_gallery_title' => ['type' => 'string', 'max' => 120],
+                'landing_cta_gallery_text' => ['type' => 'string', 'max' => 1000],
+                'landing_cta_gallery_rsvp_label' => ['type' => 'string', 'max' => 80],
+                'landing_cta_gallery_rsvp_url' => ['type' => 'string', 'max' => 2048],
+                'landing_cta_gallery_location_label' => ['type' => 'string', 'max' => 80],
+                'landing_cta_gallery_location_url' => ['type' => 'url', 'max' => 2048],
             ],
         ];
 
         foreach ($conditionalFields as $section => $fields) {
-            foreach ($fields as $field => [$type, $maxLength]) {
+            foreach ($fields as $field => $fieldRules) {
+                $type = $fieldRules['type'];
+                $maxLength = $fieldRules['max'];
                 $rules[$field] = [
                     Rule::requiredIf($request->boolean('landing_section_'.$section)),
                     'nullable',
