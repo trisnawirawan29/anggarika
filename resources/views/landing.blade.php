@@ -65,7 +65,7 @@
                             <span class="icon-bar"></span>
                         </button>
                         <h1 class="site-logo">
-                            <a class="navbar-brand" href="{{ route('landing') }}">Millar & Aliza</a>
+                            <a class="navbar-brand" href="{{ route('landing') }}">{{ $landing['landing_page_title'] }}</a>
                         </h1>
                     </div>
                     <div id="navbar" class="navbar-collapse collapse navbar-right navigation-holder">
