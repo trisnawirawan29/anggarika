@@ -216,12 +216,16 @@
                         @php
                             $socialEnabledKey = 'landing_'.$person['key'].'_'.$network['key'].'_enabled';
                             $socialUrlKey = 'landing_'.$person['key'].'_'.$network['key'].'_url';
+                            $socialUsernameKey = 'landing_'.$person['key'].'_'.$network['key'].'_username';
                         @endphp
                         <div class="col-md-6">
                             <div class="border rounded p-3">
                                 <div class="form-check form-switch mb-2"><input type="hidden" name="{{ $socialEnabledKey }}" value="0"><input class="form-check-input" type="checkbox" role="switch" id="{{ $socialEnabledKey }}" name="{{ $socialEnabledKey }}" value="1" @checked(filter_var(old($socialEnabledKey, $settings[$socialEnabledKey] ?? '1'), FILTER_VALIDATE_BOOLEAN))><label class="form-check-label" for="{{ $socialEnabledKey }}">Tampilkan {{ $network['label'] }}</label></div>
-                                <label class="form-label">Username / link {{ $network['label'] }}</label>
-                                <input data-social-field name="{{ $socialUrlKey }}" class="form-control" value="{{ old($socialUrlKey, $settings[$socialUrlKey] ?? '#') }}" @required(filter_var(old($socialEnabledKey, $settings[$socialEnabledKey] ?? '1'), FILTER_VALIDATE_BOOLEAN))>
+                                <label class="form-label">Username {{ $network['label'] }}</label>
+                                <input data-social-field name="{{ $socialUsernameKey }}" class="form-control mb-2" placeholder="Contoh: @username" value="{{ old($socialUsernameKey, $settings[$socialUsernameKey] ?? '') }}">
+                                <label class="form-label">Link tujuan {{ $network['label'] }}</label>
+                                <input data-social-field name="{{ $socialUrlKey }}" class="form-control" placeholder="https://..." value="{{ old($socialUrlKey, $settings[$socialUrlKey] ?? '#') }}" @required(filter_var(old($socialEnabledKey, $settings[$socialEnabledKey] ?? '1'), FILTER_VALIDATE_BOOLEAN))>
+                                <small class="text-muted">Username tampil di landing page, sedangkan link digunakan saat ikon diklik.</small>
                             </div>
                         </div>
                     @endforeach

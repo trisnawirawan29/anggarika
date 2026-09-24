@@ -143,7 +143,143 @@
         @endif
 
         @if ($landing['landing_section_couple'])
-         <!-- couple-area start -->
+        <style>
+            .couple-area .couple-socials {
+                display: block !important;
+                width: 100%;
+                margin-top: 24px;
+            }
+
+            .couple-area .couple-social-list {
+                all: unset;
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                justify-content: center;
+                gap: 10px;
+                width: 100%;
+                max-width: 340px;
+                margin: 0 auto;
+                padding: 0;
+                list-style: none;
+            }
+
+            .couple-area .couple-social-item {
+                all: unset;
+                display: block;
+                min-width: 0;
+                margin: 0 !important;
+                padding: 0;
+                list-style: none;
+            }
+
+            .couple-area .couple-social-link {
+                all: unset;
+                position: relative;
+                isolation: isolate;
+                overflow: hidden;
+                display: flex !important;
+                align-items: center;
+                gap: 8px;
+                width: 100% !important;
+                min-height: 42px;
+                box-sizing: border-box;
+                padding: 6px 10px;
+                border: 0 !important;
+                border-radius: 14px;
+                background: linear-gradient(135deg, #85aaba, #557f91);
+                box-shadow: 0 8px 18px rgba(56, 92, 105, .2);
+                color: #fff !important;
+                cursor: pointer;
+                text-decoration: none !important;
+                transform: none !important;
+                clip-path: none !important;
+                transition: transform .25s ease, box-shadow .25s ease, background .25s ease;
+            }
+
+            .couple-area .couple-social-link::before {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: -70%;
+                z-index: -1;
+                width: 45%;
+                content: '';
+                background: rgba(255, 255, 255, .25);
+                transform: skewX(-20deg);
+                transition: left .5s ease;
+            }
+
+            .couple-area .couple-social-link i {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                flex: 0 0 28px;
+                width: 28px;
+                height: 28px;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, .2);
+                color: #fff;
+                font-size: 14px;
+                line-height: 1;
+                transform: none !important;
+                clip-path: none !important;
+                transition: transform .25s ease, background .25s ease;
+            }
+
+            .couple-area .couple-social-link:hover {
+                background: linear-gradient(135deg, #6f9bad, #3f697c);
+                box-shadow: 0 12px 24px rgba(56, 92, 105, .3);
+                transform: translateY(-4px) !important;
+            }
+
+            .couple-area .couple-social-link:hover::before {
+                left: 125%;
+            }
+
+            .couple-area .couple-social-link:hover i {
+                background: rgba(255, 255, 255, .35);
+                transform: rotate(12deg) scale(1.08);
+            }
+
+            .couple-area .couple-social-username {
+                display: block !important;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                min-width: 0;
+                max-width: 100%;
+                color: #fff !important;
+                font-size: 11px;
+                font-weight: 700;
+                line-height: 1.2;
+                opacity: 1 !important;
+            }
+
+            @media (max-width: 575px) {
+                .couple-area .couple-social-list {
+                    max-width: 300px;
+                    gap: 8px;
+                }
+
+                .couple-area .couple-social-link {
+                    min-height: 40px;
+                    padding: 5px 7px;
+                    gap: 6px;
+                }
+
+                .couple-area .couple-social-link i {
+                    flex-basis: 25px;
+                    width: 25px;
+                    height: 25px;
+                    font-size: 12px;
+                }
+
+                .couple-area .couple-social-username {
+                    font-size: 10px;
+                }
+            }
+        </style>
+        <!-- couple-area start -->
         <div id="couple" class="couple-area section-padding">
             <div class="container">
                 <div class="col-l2">
@@ -163,11 +299,11 @@
                                         <h4 style="font-size: {{ (int) $landing['landing_groom_name_font_size'] }}px;{{ $landing['landing_groom_name_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_groom_name_font_family'].';' : '' }}">{{ $landing['landing_groom_name'] }}</h4>
                                         <p style="white-space: pre-line;">{{ $landing['landing_groom_bio'] }}</p>
                                     </div>
-                                    <div class="social-icon">
-                                        <ul>
+                                    <div class="couple-socials">
+                                        <ul class="couple-social-list">
                                             @foreach (['facebook', 'twitter', 'instagram', 'linkedin'] as $network)
                                                 @if ($landing['landing_groom_'.$network.'_enabled'])
-                                                <li><a href="{{ $landing['landing_groom_'.$network.'_url'] }}" target="_blank" rel="noopener"><i class="ti-{{ $network }}"></i></a></li>
+                                                <li class="couple-social-item"><a class="couple-social-link" href="{{ $landing['landing_groom_'.$network.'_url'] }}" target="_blank" rel="noopener"><i class="fa fa-{{ $network }}" aria-hidden="true"></i><span class="couple-social-username">{{ $landing['landing_groom_'.$network.'_username'] ?: '@'.$network }}</span></a></li>
                                                 @endif
                                             @endforeach
                                         </ul>
@@ -185,11 +321,11 @@
                                         <h4 style="font-size: {{ (int) $landing['landing_bride_name_font_size'] }}px;{{ $landing['landing_bride_name_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_bride_name_font_family'].';' : '' }}">{{ $landing['landing_bride_name'] }}</h4>
                                         <p style="white-space: pre-line;">{{ $landing['landing_bride_bio'] }}</p>
                                     </div>
-                                    <div class="social-icon">
-                                        <ul>
+                                    <div class="couple-socials">
+                                        <ul class="couple-social-list">
                                             @foreach (['facebook', 'twitter', 'instagram', 'linkedin'] as $network)
                                                 @if ($landing['landing_bride_'.$network.'_enabled'])
-                                                <li><a href="{{ $landing['landing_bride_'.$network.'_url'] }}" target="_blank" rel="noopener"><i class="ti-{{ $network }}"></i></a></li>
+                                                <li class="couple-social-item"><a class="couple-social-link" href="{{ $landing['landing_bride_'.$network.'_url'] }}" target="_blank" rel="noopener"><i class="fa fa-{{ $network }}" aria-hidden="true"></i><span class="couple-social-username">{{ $landing['landing_bride_'.$network.'_username'] ?: '@'.$network }}</span></a></li>
                                                 @endif
                                             @endforeach
                                         </ul>

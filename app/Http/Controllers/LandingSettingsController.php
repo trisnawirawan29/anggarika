@@ -211,6 +211,13 @@ class LandingSettingsController extends Controller
                     'string',
                     'max:2048',
                 ];
+                $usernameKey = 'landing_'.$person.'_'.$network.'_username';
+                $rules[$usernameKey] = [
+                    Rule::requiredIf($request->boolean('landing_section_couple') && $request->boolean($enabledKey)),
+                    'nullable',
+                    'string',
+                    'max:80',
+                ];
             }
         }
 
