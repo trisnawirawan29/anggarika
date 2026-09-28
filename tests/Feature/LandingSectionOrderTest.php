@@ -6,6 +6,8 @@ use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class LandingSectionOrderTest extends TestCase
@@ -36,5 +38,22 @@ class LandingSectionOrderTest extends TestCase
         $content = $this->get(route('landing'))->assertOk()->getContent();
 
         $this->assertStringContainsString('["hero","story","couple"', $content);
+    }
+
+    public function test_admin_can_upload_mp3_file(): void
+    {
+        Storage::fake('public');
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.landing-settings.photo'), [
+                'photo_key' => 'landing_music_file',
+                'photo' => UploadedFile::fake()->create('wedding.mp3', 100, 'audio/mpeg'),
+            ])
+            ->assertOk()
+            ->assertJsonStructure(['url']);
+
+        Storage::disk('public')->assertExists((string) Setting::value('landing_music_file'));
     }
 }
