@@ -113,7 +113,7 @@
         <!-- end of header -->         
         @if ($landing['landing_section_hero'])
         <!-- start of hero -->
-        <section class="hero-slider hero-style-3">
+        <section class="hero-slider hero-style-3" data-landing-section="hero">
             <div class="slide-wrapper">
                 <div id="spirit-header" class="spirit-header">
                     <canvas id="spirit-canvas"></canvas>
@@ -280,7 +280,7 @@
             }
         </style>
         <!-- couple-area start -->
-        <div id="couple" class="couple-area section-padding">
+        <div id="couple" class="couple-area section-padding" data-landing-section="couple">
             <div class="container">
                 <div class="col-l2">
                     <div class="section-title text-center">
@@ -341,7 +341,7 @@
         @endif
         @if ($landing['landing_section_countdown'])
         <!-- start count-down-section -->
-        <div class="count-down-area count-down-area-sub" style="background-image: url('{{ $landing['landing_countdown_background'] }}');">
+        <div class="count-down-area count-down-area-sub" data-landing-section="countdown" style="background-image: url('{{ $landing['landing_countdown_background'] }}');">
             <section class="count-down-section section-padding parallax" data-speed="7">
                 <div class="container">
                     <div class="col-12 text-center">
@@ -364,7 +364,7 @@
         @endif
         @if ($landing['landing_section_story'])
         <!-- start story-section -->
-        <section class="story-section section-padding" id="story">
+        <section class="story-section section-padding" id="story" data-landing-section="story">
             <div class="container">
                 <div class="row">
                     <div class="col col-xs-12">
@@ -467,7 +467,7 @@
         @endif
         @if ($landing['landing_section_cta'])
         <!-- cta area start-->
-        <div class="cta-area" style="background-image: url('{{ $landing['landing_cta_background'] }}');">
+        <div class="cta-area" data-landing-section="cta" style="background-image: url('{{ $landing['landing_cta_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -489,7 +489,7 @@
         @endif
         @if ($landing['landing_section_event'])
         <!-- event-area -->
-        <div id="event" class="event-section">
+        <div id="event" class="event-section" data-landing-section="event">
             <div class="container">
                 <div class="col-12">
                     <div class="section-title text-center">
@@ -610,7 +610,7 @@
         @endif
         @if ($landing['landing_section_people'])
         <!-- groomsmen-bridesmaid-area start -->
-        <div id="people" class="groomsmen-bridesmaid-area pt--150 pb--70">
+        <div id="people" class="groomsmen-bridesmaid-area pt--150 pb--70" data-landing-section="people">
             <div class="container">
                 <div class="col-l2">
                     <div class="section-title text-center">
@@ -780,7 +780,7 @@
         <!-- groomsmen-bridesmaid-area start -->
         @endif
         @if ($landing['landing_section_cta_gallery'])
-        <div class="cta-area" style="background-image: url('{{ $landing['landing_cta_gallery_background'] }}');">
+        <div class="cta-area" data-landing-section="cta_gallery" style="background-image: url('{{ $landing['landing_cta_gallery_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -801,7 +801,7 @@
         @endif
         @if ($landing['landing_section_gallery'])
         <!--Start project area-->  
-        <section id="gallery" class="gallery-section section-padding">
+        <section id="gallery" class="gallery-section section-padding" data-landing-section="gallery">
             <div class="container">
                 <div class="col-l2">
                     <div class="section-title text-center">
@@ -883,7 +883,7 @@
 
         @if ($landing['landing_section_rsvp'])
         <!-- rsvp-area strat -->
-        <div id="rsvp" class="rsvp-area go-rsvp-area" style="background-image: url('{{ $landing['landing_rsvp_background'] }}');">
+        <div id="rsvp" class="rsvp-area go-rsvp-area" data-landing-section="rsvp" style="background-image: url('{{ $landing['landing_rsvp_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
@@ -942,7 +942,7 @@
         @endif
         @if ($landing['landing_section_gta'])
         <!-- getting-area start -->
-        <div class="gta-area">
+        <div class="gta-area" data-landing-section="gta">
             <div class="container">
                 <div class="col-12">
                     <div class="section-title text-center">
@@ -979,7 +979,7 @@
         @endif
         @if ($landing['landing_section_gift'])
         <!-- Gift Registration start -->
-        <div class="Gift-area pt--100 pb--30">
+        <div class="Gift-area pt--100 pb--30" data-landing-section="gift">
             <div class="container">
                 <div class="col-12">
                     <div class="section-title text-center">
@@ -1002,7 +1002,7 @@
 
         @if ($landing['landing_section_footer'])
         <!-- start site-footer -->
-        <footer class="site-footer" style="background-image: url('{{ $landing['landing_footer_background'] }}');">
+        <footer class="site-footer" data-landing-section="footer" style="background-image: url('{{ $landing['landing_footer_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="text">
@@ -1020,7 +1020,7 @@
         @endif
         @if ($landing['landing_section_music'] && $landing['landing_music_file'] !== '')
         <!-- strat music-box -->
-        <div class="music-box">
+        <div class="music-box" data-landing-section="music">
             <button class="music-box-toggle-btn">
                 <i class="ti-music-alt"></i>
             </button>
@@ -1059,5 +1059,23 @@
 
     <!-- Custom script for this template -->
     <script src="{{ asset('assets/js/script.js') }}"></script>
+    <script>
+        (() => {
+            const wrapper = document.querySelector('.page-wrapper');
+            const sectionOrder = @json($landing['landing_section_order']);
+            if (!wrapper || !Array.isArray(sectionOrder)) {
+                return;
+            }
+
+            const sections = new Map([...wrapper.querySelectorAll('[data-landing-section]')]
+                .map((section) => [section.dataset.landingSection, section]));
+            sectionOrder.forEach((sectionName) => {
+                const section = sections.get(sectionName);
+                if (section) {
+                    wrapper.appendChild(section);
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

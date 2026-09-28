@@ -7,6 +7,12 @@ use Illuminate\View\View;
 
 class LandingController extends Controller
 {
+    /** @var list<string> */
+    private const LANDING_SECTION_ORDER = [
+        'hero', 'couple', 'countdown', 'story', 'cta', 'event', 'people', 'cta_gallery',
+        'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music',
+    ];
+
     public function __invoke(): View
     {
         $defaults = [
@@ -113,6 +119,13 @@ class LandingController extends Controller
             fn (bool $default, string $key): array => [$key => filter_var($settings->get($key, $default), FILTER_VALIDATE_BOOLEAN)]
         );
         $landing = $landing->merge($sections);
+        $sectionOrder = json_decode((string) $settings->get('landing_section_order'), true);
+        $landing['landing_section_order'] = is_array($sectionOrder)
+            && count($sectionOrder) === count(self::LANDING_SECTION_ORDER)
+            && ! array_diff(self::LANDING_SECTION_ORDER, $sectionOrder)
+            && ! array_diff($sectionOrder, self::LANDING_SECTION_ORDER)
+            ? $sectionOrder
+            : self::LANDING_SECTION_ORDER;
 
         $photoDefaults = [
             'landing_hero_background' => 'assets/images/slider/slide-4.jpg',

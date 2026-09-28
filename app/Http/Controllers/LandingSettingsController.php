@@ -9,10 +9,17 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
 
 class LandingSettingsController extends Controller
 {
+    /** @var list<string> */
+    private const LANDING_SECTION_ORDER = [
+        'hero', 'couple', 'countdown', 'story', 'cta', 'event', 'people', 'cta_gallery',
+        'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music',
+    ];
+
     /** @var list<string> */
     private const LANDING_PHOTO_KEYS = [
         'landing_hero_background',
@@ -29,8 +36,9 @@ class LandingSettingsController extends Controller
     public function edit(): View
     {
         $settings = Setting::query()->pluck('value', 'key');
+        $sectionOrder = $this->sectionOrder($settings->get('landing_section_order'));
 
-        return view('admin.landing-settings', compact('settings'));
+        return view('admin.landing-settings', compact('settings', 'sectionOrder'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -90,6 +98,7 @@ class LandingSettingsController extends Controller
             'landing_section_gift' => ['required', 'boolean'],
             'landing_section_footer' => ['required', 'boolean'],
             'landing_section_music' => ['required', 'boolean'],
+            'landing_section_order' => ['required', 'json'],
             ...array_fill_keys(self::LANDING_PHOTO_KEYS, ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048']),
             'landing_music_file' => ['nullable', 'file', 'mimes:mp3', 'max:10240'],
         ];
@@ -255,12 +264,22 @@ class LandingSettingsController extends Controller
             'gift' => ['landing_section_gift'],
             'music' => ['landing_section_music', 'landing_music_file'],
             'footer' => ['landing_section_footer', 'landing_footer_title', 'landing_footer_background'],
+            'order' => ['landing_section_order'],
         ];
 
         $section = $request->validate([
             'save_section' => ['required', Rule::in(array_keys($sectionFields))],
         ])['save_section'];
         $data = $request->validate(array_intersect_key($rules, array_flip($sectionFields[$section])));
+
+        if ($section === 'order') {
+            $order = json_decode($data['landing_section_order'], true);
+            if (! $this->isValidSectionOrder($order)) {
+                throw ValidationException::withMessages([
+                    'landing_section_order' => 'Urutan section tidak valid.',
+                ]);
+            }
+        }
 
         foreach (self::LANDING_PHOTO_KEYS as $key) {
             if (! $request->hasFile($key)) {
@@ -299,6 +318,26 @@ class LandingSettingsController extends Controller
         AuditLogger::record('landing_settings.updated', 'Pengaturan landing page diperbarui.', null, [], ['keys' => array_keys($data)]);
 
         return back()->with('success', 'Pengaturan landing page berhasil disimpan.');
+    }
+
+    /** @return list<string> */
+    private function sectionOrder(?string $value): array
+    {
+        $order = json_decode($value ?? '', true);
+
+        if (! $this->isValidSectionOrder($order)) {
+            return self::LANDING_SECTION_ORDER;
+        }
+
+        return $order;
+    }
+
+    private function isValidSectionOrder(mixed $order): bool
+    {
+        return is_array($order)
+            && count($order) === count(self::LANDING_SECTION_ORDER)
+            && ! array_diff(self::LANDING_SECTION_ORDER, $order)
+            && ! array_diff($order, self::LANDING_SECTION_ORDER);
     }
 
     public function uploadPhoto(Request $request): JsonResponse

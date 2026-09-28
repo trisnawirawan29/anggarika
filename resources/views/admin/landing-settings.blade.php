@@ -120,6 +120,34 @@
         transform: translateX(3px);
     }
 
+    .landing-section-order-list {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .landing-section-order-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        border: 1px solid #e9e7f5;
+        border-radius: 10px;
+        background: #fff;
+        cursor: grab;
+    }
+
+    .landing-section-order-item.is-dragging {
+        opacity: .5;
+    }
+
+    [data-bs-theme="dark"] .landing-section-order-item {
+        border-color: #3b4354;
+        background: #252b38;
+    }
+
     .landing-settings-tabs .nav-link.active .badge {
         color: #6c63ff !important;
         background: #fff !important;
@@ -182,6 +210,20 @@
     <form method="POST" action="{{ route('admin.landing-settings.update') }}" enctype="multipart/form-data">
         @csrf @method('PUT')
         <input type="hidden" name="save_section" value="">
+
+        <div class="content-card mb-4">
+            <div class="section-title"><span class="section-number">00</span><div><h5>Urutan section</h5><p>Tarik section untuk menentukan urutannya di landing page.</p></div></div>
+            <input type="hidden" name="landing_section_order" value="{{ json_encode($sectionOrder) }}">
+            <ol class="landing-section-order-list" aria-label="Urutan section landing page">
+                @php
+                    $sectionLabels = ['hero' => 'Hero', 'couple' => 'Pasangan', 'countdown' => 'Countdown', 'story' => 'Cerita', 'cta' => 'CTA', 'event' => 'Acara', 'people' => 'Keluarga & teman', 'cta_gallery' => 'CTA sebelum galeri', 'gallery' => 'Galeri', 'rsvp' => 'RSVP', 'gta' => 'Informasi perjalanan', 'gift' => 'Gift registration', 'footer' => 'Footer', 'music' => 'Music player'];
+                @endphp
+                @foreach ($sectionOrder as $sectionKey)
+                    <li class="landing-section-order-item" draggable="true" data-section="{{ $sectionKey }}"><i class="fas fa-grip-vertical text-muted"></i><span>{{ $sectionLabels[$sectionKey] }}</span></li>
+                @endforeach
+            </ol>
+            <div class="form-text mt-3">Urutan ini hanya memengaruhi section yang sedang ditampilkan.</div>
+        </div>
 
         <div class="content-card mb-4"><div class="section-title"><span class="section-number">01</span><div><h5>Hero</h5><p>Judul halaman, teks pembuka, dan foto utama.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_hero" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_hero" name="landing_section_hero" value="1" @checked(old('landing_section_hero', $settings['landing_section_hero'] ?? '1'))><label class="form-check-label" for="landing_section_hero">Tampilkan hero</label></div><div class="row g-3"><div class="col-md-6"><label class="form-label">Judul halaman/aplikasi</label><input name="landing_page_title" class="form-control" value="{{ old('landing_page_title', $settings['landing_page_title'] ?? 'Millar & Aliza · Wedding Invitation') }}" required></div><div class="col-md-6"><label class="form-label">Subjudul hero</label><input name="landing_hero_subtitle" class="form-control" value="{{ old('landing_hero_subtitle', $settings['landing_hero_subtitle'] ?? 'WERE GETTING MARRIED') }}" required></div><div class="col-md-6"><label class="form-label">Judul hero</label><input name="landing_hero_title" class="form-control" value="{{ old('landing_hero_title', $settings['landing_hero_title'] ?? 'Save Our Date') }}" required></div><div class="col-md-6"><label class="form-label">Tanggal hero</label><input name="landing_hero_date" class="form-control" value="{{ old('landing_hero_date', $settings['landing_hero_date'] ?? '25 December 2019') }}" required></div></div><div class="row g-4 mt-1"><div class="col-6 col-md-3"><img src="{{ $photoUrl($photo('landing_hero_background', 'Background hero', 'assets/images/slider/slide-4.jpg')) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">Background hero</label><input type="file" name="landing_hero_background" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div></div></div>
 
@@ -395,6 +437,31 @@
         wizardLayout.append(sidebar, content);
         form.prepend(wizardLayout);
 
+        const orderList = form.querySelector('.landing-section-order-list');
+        const orderInput = form.querySelector('input[name="landing_section_order"]');
+        const syncSectionOrder = () => {
+            if (orderInput && orderList) {
+                orderInput.value = JSON.stringify([...orderList.querySelectorAll('[data-section]')].map((item) => item.dataset.section));
+            }
+        };
+        orderList?.querySelectorAll('[data-section]').forEach((item) => {
+            item.addEventListener('dragstart', () => item.classList.add('is-dragging'));
+            item.addEventListener('dragend', () => {
+                item.classList.remove('is-dragging');
+                syncSectionOrder();
+            });
+            item.addEventListener('dragover', (event) => {
+                event.preventDefault();
+                const draggingItem = orderList.querySelector('.is-dragging');
+                if (!draggingItem || draggingItem === item) {
+                    return;
+                }
+
+                const shouldInsertBefore = event.clientY < item.getBoundingClientRect().top + item.offsetHeight / 2;
+                orderList.insertBefore(draggingItem, shouldInsertBefore ? item : item.nextSibling);
+            });
+        });
+
         const activateTab = (activeIndex) => {
             cards.forEach((card, index) => {
                 card.hidden = index !== activeIndex;
@@ -438,6 +505,7 @@
                 'Gift registration': 'gift',
                 'Music player': 'music',
                 'Footer': 'footer',
+                'Urutan section': 'order',
             };
             saveButton.dataset.section = sectionNames[heading.querySelector('h5')?.textContent.trim()] || '';
             saveButton.addEventListener('click', () => {
