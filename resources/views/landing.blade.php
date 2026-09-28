@@ -1030,12 +1030,29 @@
             <script>
                 (() => {
                     const music = document.getElementById('landing-music');
+                    const toggleButton = document.querySelector('.music-box-toggle-btn');
                     if (!music) {
                         return;
                     }
 
-                    music.play().catch(() => {
-                        document.addEventListener('click', () => music.play().catch(() => {}), {once: true});
+                    const playMusic = () => music.play();
+                    const startAfterInteraction = () => {
+                        playMusic().catch(() => {});
+                        document.removeEventListener('pointerdown', startAfterInteraction);
+                        document.removeEventListener('keydown', startAfterInteraction);
+                    };
+
+                    playMusic().catch(() => {
+                        document.addEventListener('pointerdown', startAfterInteraction, {once: true, passive: true});
+                        document.addEventListener('keydown', startAfterInteraction, {once: true});
+                    });
+
+                    toggleButton?.addEventListener('click', () => {
+                        if (music.paused) {
+                            playMusic().catch(() => {});
+                        } else {
+                            music.pause();
+                        }
                     });
                 })();
             </script>
