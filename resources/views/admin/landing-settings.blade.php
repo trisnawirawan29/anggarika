@@ -344,7 +344,49 @@
             @endforeach
         </div>
 
-        <div class="content-card mb-4"><div class="section-title"><span class="section-number">05</span><div><h5>Acara</h5><p>Judul dan foto setiap acara.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_event" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_event" name="landing_section_event" value="1" @checked(old('landing_section_event', $settings['landing_section_event'] ?? '1'))><label class="form-check-label" for="landing_section_event">Tampilkan acara</label></div><label class="form-label">Judul acara</label><input name="landing_event_title" class="form-control mb-3" value="{{ old('landing_event_title', $settings['landing_event_title'] ?? 'When & Where') }}" required><div class="row g-4">@foreach ([[$photo('landing_event_photo_1', 'Acara 1', 'assets/images/events/img-1.jpg')], [$photo('landing_event_photo_2', 'Acara 2', 'assets/images/events/img-2.jpg')], [$photo('landing_event_photo_3', 'Acara 3', 'assets/images/events/img-3.jpg')], [$photo('landing_event_photo_4', 'Acara 4', 'assets/images/events/img-4.jpg')]] as $item)<div class="col-6 col-md-3">@php($item = $item[0])<img src="{{ $photoUrl($item) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">{{ $item['label'] }}</label><input type="file" name="{{ $item['key'] }}" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div>@endforeach</div></div>
+        <div class="content-card mb-4">
+            <div class="section-title"><span class="section-number">05</span><div><h5>Acara</h5><p>Atur isi, foto, link lokasi, dan tampil/sembunyi setiap acara.</p></div></div>
+            <div class="form-check form-switch mb-3">
+                <input type="hidden" name="landing_section_event" value="0">
+                <input class="form-check-input" type="checkbox" role="switch" id="landing_section_event" name="landing_section_event" value="1" @checked(old('landing_section_event', $settings['landing_section_event'] ?? '1'))>
+                <label class="form-check-label" for="landing_section_event">Tampilkan section acara</label>
+            </div>
+            <label class="form-label">Judul section acara</label>
+            <input name="landing_event_title" class="form-control mb-4" value="{{ old('landing_event_title', $settings['landing_event_title'] ?? 'When & Where') }}" required>
+
+            @foreach ([
+                1 => ['label' => 'Ceremony', 'defaultTitle' => 'Wedding Ceremony', 'defaultPhoto' => 'assets/images/events/img-1.jpg'],
+                2 => ['label' => 'Party', 'defaultTitle' => 'Wedding Party', 'defaultPhoto' => 'assets/images/events/img-2.jpg'],
+                3 => ['label' => 'Dinner', 'defaultTitle' => 'Wedding Dinner', 'defaultPhoto' => 'assets/images/events/img-3.jpg'],
+                4 => ['label' => 'Reception', 'defaultTitle' => 'Reception Party', 'defaultPhoto' => 'assets/images/events/img-4.jpg'],
+            ] as $number => $event)
+                @php
+                    $eventEnabledKey = 'landing_event_'.$number.'_enabled';
+                    $eventPhoto = $photo('landing_event_photo_'.$number, 'Foto '.$event['label'], $event['defaultPhoto']);
+                    $eventIsEnabled = filter_var(old($eventEnabledKey, $settings[$eventEnabledKey] ?? '1'), FILTER_VALIDATE_BOOLEAN);
+                @endphp
+                <div class="border rounded p-3 mb-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">Acara {{ $number }} — {{ $event['label'] }}</h6>
+                        <div class="form-check form-switch mb-0">
+                            <input type="hidden" name="{{ $eventEnabledKey }}" value="0">
+                            <input class="form-check-input" type="checkbox" role="switch" id="{{ $eventEnabledKey }}" name="{{ $eventEnabledKey }}" value="1" @checked($eventIsEnabled)>
+                            <label class="form-check-label" for="{{ $eventEnabledKey }}">Tampilkan acara</label>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label">Nama acara</label><input data-event-field name="landing_event_{{ $number }}_title" class="form-control" value="{{ old('landing_event_'.$number.'_title', $settings['landing_event_'.$number.'_title'] ?? $event['defaultTitle']) }}" @required($eventIsEnabled)></div>
+                        <div class="col-md-6"><label class="form-label">Tanggal & waktu</label><input data-event-field name="landing_event_{{ $number }}_date" class="form-control" value="{{ old('landing_event_'.$number.'_date', $settings['landing_event_'.$number.'_date'] ?? 'Sunday, 25 July 18, 9.00 AM-5.00 PM') }}" @required($eventIsEnabled)></div>
+                        <div class="col-md-6"><label class="form-label">Lokasi</label><input data-event-field name="landing_event_{{ $number }}_location" class="form-control" value="{{ old('landing_event_'.$number.'_location', $settings['landing_event_'.$number.'_location'] ?? '256 Apay Road, Califonia Bong, London') }}" @required($eventIsEnabled)></div>
+                        <div class="col-12"><div class="form-check form-switch"><input type="hidden" name="landing_event_{{ $number }}_location_enabled" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_event_{{ $number }}_location_enabled" name="landing_event_{{ $number }}_location_enabled" value="1" @checked(filter_var(old('landing_event_'.$number.'_location_enabled', $settings['landing_event_'.$number.'_location_enabled'] ?? '1'), FILTER_VALIDATE_BOOLEAN))><label class="form-check-label" for="landing_event_{{ $number }}_location_enabled">Tampilkan tombol lokasi</label></div></div>
+                        <div class="col-md-6"><label class="form-label">Teks tombol lokasi</label><input data-event-location-field name="landing_event_{{ $number }}_location_label" class="form-control" value="{{ old('landing_event_'.$number.'_location_label', $settings['landing_event_'.$number.'_location_label'] ?? 'Location') }}"></div>
+                        <div class="col-12"><label class="form-label">Link Google Maps / lokasi</label><input data-event-location-field type="url" name="landing_event_{{ $number }}_location_url" class="form-control" value="{{ old('landing_event_'.$number.'_location_url', $settings['landing_event_'.$number.'_location_url'] ?? '') }}"></div>
+                        <div class="col-md-8"><label class="form-label">Deskripsi acara</label><textarea data-event-field name="landing_event_{{ $number }}_text" class="form-control" rows="4" @required($eventIsEnabled)>{{ old('landing_event_'.$number.'_text', $settings['landing_event_'.$number.'_text'] ?? 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.') }}</textarea></div>
+                        <div class="col-md-4"><img src="{{ $photoUrl($eventPhoto) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover" alt="Preview {{ $event['label'] }}"><label class="form-label small">{{ $eventPhoto['label'] }}</label><input type="file" name="{{ $eventPhoto['key'] }}" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div>
+                    </div>
+                </div>
+            @endforeach
+        </div>
 
         <div class="content-card mb-4"><div class="section-title"><span class="section-number">06</span><div><h5>Keluarga & teman</h5><p>Pengaturan section orang-orang terdekat.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_people" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_people" name="landing_section_people" value="1" @checked(old('landing_section_people', $settings['landing_section_people'] ?? '1'))><label class="form-check-label" for="landing_section_people">Tampilkan keluarga & teman</label></div><label class="form-label">Judul section</label><input name="landing_people_title" class="form-control" value="{{ old('landing_people_title', $settings['landing_people_title'] ?? 'Groomsmen & Bridesmaid') }}" required></div>
 
@@ -600,6 +642,31 @@
             });
 
             toggle.addEventListener('change', syncRequiredState);
+            syncRequiredState();
+        });
+
+        document.querySelectorAll('[id^="landing_event_"][id$="_enabled"]').forEach((toggle) => {
+            const eventCard = toggle.closest('.border.rounded');
+            const fields = eventCard?.querySelectorAll('[data-event-field]') || [];
+            const syncRequiredState = () => fields.forEach((field) => {
+                field.required = toggle.checked;
+            });
+
+            toggle.addEventListener('change', syncRequiredState);
+            syncRequiredState();
+        });
+
+        document.querySelectorAll('[id^="landing_event_"][id$="_location_enabled"]').forEach((toggle) => {
+            const eventCard = toggle.closest('.border.rounded');
+            const eventNumber = toggle.name.match(/landing_event_(\d+)_location_enabled/)?.[1];
+            const eventToggle = form.querySelector(`[name="landing_event_${eventNumber}_enabled"]`);
+            const fields = eventCard?.querySelectorAll('[data-event-location-field]') || [];
+            const syncRequiredState = () => fields.forEach((field) => {
+                field.required = toggle.checked && Boolean(eventToggle?.checked);
+            });
+
+            toggle.addEventListener('change', syncRequiredState);
+            eventToggle?.addEventListener('change', syncRequiredState);
             syncRequiredState();
         });
     })();

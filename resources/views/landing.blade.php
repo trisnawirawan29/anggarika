@@ -164,12 +164,14 @@
             }
 
             .couple-area .couple-social-item {
-                all: unset;
-                display: block;
-                min-width: 0;
+                display: block !important;
+                width: auto !important;
+                min-width: 0 !important;
+                height: auto !important;
                 margin: 0 !important;
-                padding: 0;
-                list-style: none;
+                padding: 0 !important;
+                line-height: normal !important;
+                list-style: none !important;
             }
 
             .couple-area .couple-social-link {
@@ -181,6 +183,7 @@
                 align-items: center;
                 gap: 8px;
                 width: 100% !important;
+                max-width: 100%;
                 min-height: 42px;
                 box-sizing: border-box;
                 padding: 6px 10px;
@@ -242,7 +245,10 @@
             }
 
             .couple-area .couple-social-username {
+                position: relative;
+                z-index: 1;
                 display: block !important;
+                flex: 1 1 auto;
                 overflow: hidden;
                 text-overflow: ellipsis;
                 white-space: nowrap;
@@ -253,6 +259,7 @@
                 font-weight: 700;
                 line-height: 1.2;
                 opacity: 1 !important;
+                visibility: visible !important;
             }
 
             @media (max-width: 575px) {
@@ -488,6 +495,27 @@
         <!-- cta area end-->         
         @endif
         @if ($landing['landing_section_event'])
+        <style>
+            .event-section .event-tabs-nav {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 12px;
+                width: fit-content;
+                max-width: 100%;
+                margin: 0 auto;
+                padding: 0;
+            }
+
+            .event-section .event-tabs-nav > li {
+                float: none;
+                margin: 0;
+            }
+
+            .event-section .event-tabs-nav > li > a {
+                margin-right: 0;
+            }
+        </style>
         <!-- event-area -->
         <div id="event" class="event-section" data-landing-section="event">
             <div class="container">
@@ -500,19 +528,28 @@
                     <div class="col-12">
                         <div class="tabs-site-button">
                             <div class="event-tabs">
+                                @php
+                                    $eventItems = collect([
+                                        ['number' => 1, 'id' => 'turbo', 'label' => 'Ceremony', 'reverse' => false],
+                                        ['number' => 2, 'id' => 'tyre', 'label' => 'Party', 'reverse' => false],
+                                        ['number' => 3, 'id' => 'car-1', 'label' => 'Dinner', 'reverse' => false],
+                                        ['number' => 4, 'id' => 'repair', 'label' => 'Reception', 'reverse' => false],
+                                    ])->filter(fn (array $event): bool => $landing['landing_event_'.$event['number'].'_enabled']);
+                                    $activeEventId = $eventItems->first()['id'] ?? null;
+                                @endphp
                                 <div class="row">
-                                    <div class="col-md-8 col-md-offset-3 col-sm-11 col-sm-offset-1 col-xs-10 col-xs-offset-2">
-                                        <ul class="nav nav-tabs">
-                                            <li class="event-content"><a data-toggle="tab" href="#turbo">Ceremony</a></li>
-                                            <li class="event-content"><a data-toggle="tab" href="#tyre">Party</a></li>
-                                            <li class="event-content"><a data-toggle="tab" href="#car-1">Dinner</a></li>
-                                            <li class="event-content"><a data-toggle="tab" href="#repair">Reception</a></li>
+                                    <div class="col-12">
+                                        <ul class="nav nav-tabs event-tabs-nav">
+                                            @foreach ($eventItems as $event)
+                                                <li class="event-content{{ $event['id'] === $activeEventId ? ' active' : '' }}"><a data-toggle="tab" href="#{{ $event['id'] }}">{{ $landing['landing_event_'.$event['number'].'_title'] }}</a></li>
+                                            @endforeach
                                         </ul>
                                     </div>
                                 </div>
                                 <div class="col-md-12 col-12">
                                     <div class="tab-content">
-                                        <div id="turbo" class="tab-pane active">
+                                        @if ($landing['landing_event_1_enabled'])
+                                        <div id="turbo" class="tab-pane{{ $activeEventId === 'turbo' ? ' active' : '' }}">
                                              <div class="event-wrap">
                                                 <div class="row">
                                                     <div class="col-md-5 col-12">
@@ -522,39 +559,47 @@
                                                     </div>
                                                     <div class="col-md-7 col-12">
                                                         <div class="event-text">
-                                                            <h3>Wedding Ceremony</h3>
-                                                            <span>Sunday, 25 July 18, 9.00 AM-5.00 PM</span>
-                                                            <span>256 Apay Road,Califonia Bong, London</span>
-                                                            <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal </p>
-                                                            <div class="btn"><a class="popup-gmaps" href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25211.21212385712!2d144.95275648773628!3d-37.82748510398018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0x5045675218ce7e0!2zTWVsYm91cm5lIFZJQyAzMDA0LCDgpoXgprjgp43gpp_gp43gprDgp4fgprLgpr_gpq_gprzgpr4!5e0!3m2!1sbn!2sbd!4v1503742051881">Location</a></div>
+                                                            <h3>{{ $landing['landing_event_1_title'] }}</h3>
+                                                            <span>{{ $landing['landing_event_1_date'] }}</span>
+                                                            <span>{{ $landing['landing_event_1_location'] }}</span>
+                                                            <p>{{ $landing['landing_event_1_text'] }}</p>
+                                                            @if ($landing['landing_event_1_location_enabled'])
+                                                            <div class="btn"><a class="popup-gmaps" href="{{ $landing['landing_event_1_location_url'] }}">{{ $landing['landing_event_1_location_label'] }}</a></div>
+                                                            @endif
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <div id="tyre" class="tab-pane">
+                                        @endif
+                                        @if ($landing['landing_event_2_enabled'])
+                                        <div id="tyre" class="tab-pane{{ $activeEventId === 'tyre' ? ' active' : '' }}">
                                             <div class="row">
                                                  <div class="event-wrap">
                                                     <div class="row">
-                                                        <div class="col-md-7">
-                                                            <div class="event-text event-text-2">
-                                                                <h3>Wedding Party</h3>
-                                                                <span>Sunday, 25 July 18, 9.00 AM-5.00 PM</span>
-                                                                <span>256 Apay Road,Califonia Bong, London</span>
-                                                                <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal </p>
-                                                                <div class="btn"><a class="popup-gmaps" href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25211.21212385712!2d144.95275648773628!3d-37.82748510398018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0x5045675218ce7e0!2zTWVsYm91cm5lIFZJQyAzMDA0LCDgpoXgprjgp43gpp_gp43gprDgp4fgprLgpr_gpq_gprzgpr4!5e0!3m2!1sbn!2sbd!4v1503742051881">Location</a></div>
-                                                            </div>
-                                                        </div>
                                                         <div class="col-md-5">
                                                             <div class="event-img">
                                                                 <img src="{{ $landing['landing_event_photo_2'] }}" alt>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-7">
+                                                            <div class="event-text">
+                                                                <h3>{{ $landing['landing_event_2_title'] }}</h3>
+                                                                <span>{{ $landing['landing_event_2_date'] }}</span>
+                                                                <span>{{ $landing['landing_event_2_location'] }}</span>
+                                                                <p>{{ $landing['landing_event_2_text'] }}</p>
+                                                                @if ($landing['landing_event_2_location_enabled'])
+                                                                <div class="btn"><a class="popup-gmaps" href="{{ $landing['landing_event_2_location_url'] }}">{{ $landing['landing_event_2_location_label'] }}</a></div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>  
                                         </div>
-                                        <div id="car-1" class="tab-pane">
+                                        @endif
+                                        @if ($landing['landing_event_3_enabled'])
+                                        <div id="car-1" class="tab-pane{{ $activeEventId === 'car-1' ? ' active' : '' }}">
                                             <div class="row">
                                                  <div class="event-wrap">
                                                     <div class="row">
@@ -565,39 +610,46 @@
                                                         </div>
                                                         <div class="col-md-7">
                                                             <div class="event-text">
-                                                                <h3>Wedding Dinner</h3>
-                                                                <span>Sunday, 25 July 18, 9.00 AM-5.00 PM</span>
-                                                                <span>256 Apay Road,Califonia Bong, London</span>
-                                                                <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal </p>
-                                                                <div class="btn"><a class="popup-gmaps" href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25211.21212385712!2d144.95275648773628!3d-37.82748510398018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0x5045675218ce7e0!2zTWVsYm91cm5lIFZJQyAzMDA0LCDgpoXgprjgp43gpp_gp43gprDgp4fgprLgpr_gpq_gprzgpr4!5e0!3m2!1sbn!2sbd!4v1503742051881">Location</a></div>
+                                                                <h3>{{ $landing['landing_event_3_title'] }}</h3>
+                                                                <span>{{ $landing['landing_event_3_date'] }}</span>
+                                                                <span>{{ $landing['landing_event_3_location'] }}</span>
+                                                                <p>{{ $landing['landing_event_3_text'] }}</p>
+                                                                @if ($landing['landing_event_3_location_enabled'])
+                                                                <div class="btn"><a class="popup-gmaps" href="{{ $landing['landing_event_3_location_url'] }}">{{ $landing['landing_event_3_location_label'] }}</a></div>
+                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>
                                                 </div>
                                             </div>  
                                         </div>
-                                        <div id="repair" class="tab-pane">
+                                        @endif
+                                        @if ($landing['landing_event_4_enabled'])
+                                        <div id="repair" class="tab-pane{{ $activeEventId === 'repair' ? ' active' : '' }}">
                                             <div class="row">
                                                  <div class="event-wrap">
                                                     <div class="row">
-                                                        <div class="col-md-7">
-                                                            <div class="event-text event-text-2">
-                                                                <h3>Reception Party</h3>
-                                                                <span>Sunday, 25 July 18, 9.00 AM-5.00 PM</span>
-                                                                <span>256 Apay Road,Califonia Bong, London</span>
-                                                                <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal </p>
-                                                                <div class="btn"><a class="popup-gmaps" href="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d25211.21212385712!2d144.95275648773628!3d-37.82748510398018!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x6ad642af0f11fd81%3A0x5045675218ce7e0!2zTWVsYm91cm5lIFZJQyAzMDA0LCDgpoXgprjgp43gpp_gp43gprDgp4fgprLgpr_gpq_gprzgpr4!5e0!3m2!1sbn!2sbd!4v1503742051881">Location</a></div>
-                                                            </div>
-                                                        </div>
                                                         <div class="col-md-5">
                                                             <div class="event-img">
                                                                 <img src="{{ $landing['landing_event_photo_4'] }}" alt>
                                                             </div>
                                                         </div>
+                                                        <div class="col-md-7">
+                                                            <div class="event-text">
+                                                                <h3>{{ $landing['landing_event_4_title'] }}</h3>
+                                                                <span>{{ $landing['landing_event_4_date'] }}</span>
+                                                                <span>{{ $landing['landing_event_4_location'] }}</span>
+                                                                <p>{{ $landing['landing_event_4_text'] }}</p>
+                                                                @if ($landing['landing_event_4_location_enabled'])
+                                                                <div class="btn"><a class="popup-gmaps" href="{{ $landing['landing_event_4_location_url'] }}">{{ $landing['landing_event_4_location_label'] }}</a></div>
+                                                                @endif
+                                                            </div>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>  
                                         </div>
+                                        @endif
                                     </div>
                                 </div>
                             </div>

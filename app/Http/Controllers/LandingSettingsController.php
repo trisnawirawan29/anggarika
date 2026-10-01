@@ -72,6 +72,7 @@ class LandingSettingsController extends Controller
             'landing_cta_gallery_location_label' => ['required', 'string', 'max:80'],
             'landing_cta_gallery_location_url' => ['required', 'url', 'max:2048'],
             'landing_event_title' => ['required', 'string', 'max:120'],
+            ...array_fill_keys(array_map(fn (int $number): string => 'landing_event_'.$number.'_enabled', range(1, 4)), ['required', 'boolean']),
             'landing_people_title' => ['required', 'string', 'max:120'],
             'landing_gallery_title' => ['required', 'string', 'max:120'],
             'landing_rsvp_title' => ['required', 'string', 'max:120'],
@@ -211,6 +212,35 @@ class LandingSettingsController extends Controller
             $rules['landing_story_'.$number.'_text'] = [$storyIsEnabled ? 'required' : 'nullable', 'string', 'max:1000'];
         }
 
+        foreach (range(1, 4) as $number) {
+            $eventIsEnabled = $request->boolean('landing_section_event')
+                && $request->boolean('landing_event_'.$number.'_enabled');
+            $locationButtonIsEnabled = $eventIsEnabled
+                && $request->boolean('landing_event_'.$number.'_location_enabled');
+
+            $rules['landing_event_'.$number.'_location_enabled'] = ['required', 'boolean'];
+
+            foreach ([
+                'title' => ['string', 120],
+                'date' => ['string', 120],
+                'location' => ['string', 255],
+                'text' => ['string', 1000],
+                'location_label' => ['string', 80],
+                'location_url' => ['string', 2048],
+            ] as $field => [$type, $maxLength]) {
+                $fieldIsRequired = in_array($field, ['location_label', 'location_url'], true)
+                    ? $locationButtonIsEnabled
+                    : $eventIsEnabled;
+
+                $rules['landing_event_'.$number.'_'.$field] = [
+                    $fieldIsRequired ? 'required' : 'nullable',
+                    'nullable',
+                    $type,
+                    'max:'.$maxLength,
+                ];
+            }
+        }
+
         foreach (['bride', 'groom'] as $person) {
             foreach (['facebook', 'twitter', 'instagram', 'linkedin'] as $network) {
                 $enabledKey = 'landing_'.$person.'_'.$network.'_enabled';
@@ -256,7 +286,19 @@ class LandingSettingsController extends Controller
                     'landing_story_photo_'.$number,
                 ], range(1, 4)),
             )],
-            'event' => ['landing_section_event', 'landing_event_title', ...array_map(fn (int $number): string => 'landing_event_photo_'.$number, range(1, 4))],
+            'event' => ['landing_section_event', 'landing_event_title', ...array_merge(
+                ...array_map(fn (int $number): array => [
+                    'landing_event_'.$number.'_enabled',
+                    'landing_event_'.$number.'_title',
+                    'landing_event_'.$number.'_date',
+                    'landing_event_'.$number.'_location',
+                    'landing_event_'.$number.'_text',
+                    'landing_event_'.$number.'_location_enabled',
+                    'landing_event_'.$number.'_location_label',
+                    'landing_event_'.$number.'_location_url',
+                    'landing_event_photo_'.$number,
+                ], range(1, 4)),
+            )],
             'people' => ['landing_section_people', 'landing_people_title'],
             'cta_gallery' => ['landing_section_cta_gallery', 'landing_cta_gallery_title', 'landing_cta_gallery_text', 'landing_cta_gallery_rsvp_label', 'landing_cta_gallery_rsvp_url', 'landing_cta_gallery_location_label', 'landing_cta_gallery_location_url', 'landing_cta_gallery_rsvp_enabled', 'landing_cta_gallery_location_enabled', 'landing_cta_gallery_background'],
             'gallery' => ['landing_section_gallery', 'landing_gallery_title', ...array_map(fn (int $number): string => 'landing_gallery_photo_'.$number, range(1, 6))],
