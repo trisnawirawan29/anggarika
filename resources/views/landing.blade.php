@@ -375,6 +375,61 @@
         <!-- end count-down-section --> 
         @endif
         @if ($landing['landing_section_story'])
+        <style>
+            @media (max-width: 767px) {
+                .story-section .story-timeline > .row {
+                    display: flex;
+                    flex-wrap: nowrap;
+                    align-items: stretch;
+                    margin-right: 0;
+                    margin-left: 0;
+                }
+
+                .story-section .story-timeline > .row > .story-media,
+                .story-section .story-timeline > .row > .story-copy {
+                    float: none;
+                    width: 50% !important;
+                    flex: 0 0 50%;
+                    padding: 0 !important;
+                }
+
+                .story-section .story-timeline > .row > .story-media {
+                    order: 1;
+                }
+
+                .story-section .story-timeline > .row > .story-copy {
+                    order: 2;
+                }
+
+                .story-section .story-timeline .story-media .img-holder {
+                    height: clamp(150px, 42vw, 220px);
+                }
+
+                .story-section .story-timeline .story-media img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    border-radius: 0;
+                }
+
+                .story-section .story-timeline .story-copy .story-text {
+                    height: 100%;
+                    padding: 18px 14px;
+                    text-align: left;
+                }
+
+                .story-section .story-timeline .story-copy h3 {
+                    margin-bottom: 6px;
+                    font-size: clamp(16px, 4.5vw, 20px);
+                }
+
+                .story-section .story-timeline .story-copy .date,
+                .story-section .story-timeline .story-copy p {
+                    font-size: clamp(11px, 3vw, 14px);
+                    line-height: 1.5;
+                }
+            }
+        </style>
         <!-- start story-section -->
         <section class="story-section section-padding" id="story" data-landing-section="story">
             <div class="container">
@@ -391,14 +446,14 @@
                         <div class="story-timeline">
                             @if ($landing['landing_story_1_enabled'])
                             <div class="row">
-                                <div class="col col-md-6">
+                                <div class="col col-md-6 story-copy">
                                     <div class="story-text right-align-text">
                                         <h3>{{ $landing['landing_story_1_title'] }}</h3>
                                         <span class="date">{{ $landing['landing_story_1_date'] }}</span>
                                         <p>{{ $landing['landing_story_1_text'] }}</p>
                                     </div>
                                 </div>
-                                <div class="col col-md-6">
+                                <div class="col col-md-6 story-media">
                                     <div class="img-holder">
                                         <img src="{{ $landing['landing_story_photo_1'] }}" alt class="img img-responsive">
                                     </div>
@@ -407,12 +462,12 @@
                             @endif
                             @if ($landing['landing_story_2_enabled'])
                             <div class="row">
-                                <div class="col col-md-6">
+                                <div class="col col-md-6 story-media">
                                     <div class="img-holder right-align-text story-slider">
                                         <img src="{{ $landing['landing_story_photo_2'] }}" alt class="img img-responsive">
                                     </div>
                                 </div>
-                                <div class="col col-md-6 text-holder">
+                                <div class="col col-md-6 text-holder story-copy">
                                     <span class="heart">
                                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                                     </span>
@@ -426,7 +481,7 @@
                             @endif
                             @if ($landing['landing_story_3_enabled'])
                             <div class="row">
-                                <div class="col col-md-6 text-holder right-heart">
+                                <div class="col col-md-6 text-holder right-heart story-copy">
                                     <span class="heart">
                                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                                     </span>
@@ -436,7 +491,7 @@
                                         <p>{{ $landing['landing_story_3_text'] }}</p>
                                     </div>
                                 </div>
-                                <div class="col col-md-6">
+                                <div class="col col-md-6 story-media">
                                     <div class="img-holder right-align-text story-slider">
                                         <img src="{{ $landing['landing_story_photo_3'] }}" alt class="img img-responsive">
                                     </div>
@@ -445,7 +500,7 @@
                             @endif
                             @if ($landing['landing_story_4_enabled'])
                             <div class="row">
-                                <div class="col col-md-6">
+                                <div class="col col-md-6 story-media">
                                     <div class="img-holder video-holder">
                                         <img src="{{ $landing['landing_story_photo_4'] }}" alt class="img img-responsive">
                                         <div class="video-btn">
@@ -458,7 +513,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col col-md-6 text-holder">
+                                <div class="col col-md-6 text-holder story-copy">
                                     <span class="heart">
                                         <i class="fa fa-thumbs-up" aria-hidden="true"></i>
                                     </span>
