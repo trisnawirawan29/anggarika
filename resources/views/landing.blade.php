@@ -478,14 +478,35 @@
         <!-- end story-section -->
         @endif
         @if ($landing['landing_section_cta'])
+        <style>
+            .cta-area .cta-title {
+                font-size: var(--cta-title-size) !important;
+            }
+
+            .cta-area .cta-description {
+                font-size: var(--cta-description-size) !important;
+            }
+
+            @media (max-width: 767px) {
+                .cta-area .cta-title {
+                    font-size: clamp(24px, 8vw, calc(var(--cta-title-size) * .72)) !important;
+                    line-height: 1.15;
+                }
+
+                .cta-area .cta-description {
+                    font-size: clamp(13px, 4.2vw, calc(var(--cta-description-size) * .9)) !important;
+                    line-height: 1.6;
+                }
+            }
+        </style>
         <!-- cta area start-->
         <div class="cta-area" data-landing-section="cta" style="background-image: url('{{ $landing['landing_cta_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="cta-content">
-                            <h2 style="font-size: {{ (int) $landing['landing_cta_title_font_size'] }}px;{{ $landing['landing_cta_title_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_cta_title_font_family'].';' : '' }}">{{ $landing['landing_cta_title'] }}</h2>
-                            <p style="white-space: pre-line;font-size: {{ (int) $landing['landing_cta_text_font_size'] }}px;{{ $landing['landing_cta_text_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_cta_text_font_family'].';' : '' }}">{{ $landing['landing_cta_text'] }}</p>
+                            <h2 class="cta-title" style="--cta-title-size: {{ (int) $landing['landing_cta_title_font_size'] }}px;{{ $landing['landing_cta_title_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_cta_title_font_family'].';' : '' }}">{{ $landing['landing_cta_title'] }}</h2>
+                            <p class="cta-description" style="white-space: pre-line;--cta-description-size: {{ (int) $landing['landing_cta_text_font_size'] }}px;{{ $landing['landing_cta_text_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_cta_text_font_family'].';' : '' }}">{{ $landing['landing_cta_text'] }}</p>
                             @if ($landing['landing_cta_rsvp_enabled'])
                             <div class="btn btn-3"><a href="{{ $landing['landing_cta_rsvp_url'] }}" class="go-rsvp-area">{{ $landing['landing_cta_rsvp_label'] }}</a></div>
                             @endif
