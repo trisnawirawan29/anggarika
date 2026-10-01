@@ -152,8 +152,8 @@
 
             .couple-area .couple-social-list {
                 all: unset;
-                display: grid !important;
-                grid-template-columns: repeat(2, minmax(0, 1fr));
+                display: flex !important;
+                flex-wrap: wrap;
                 justify-content: center;
                 gap: 10px;
                 width: 100%;
@@ -165,6 +165,7 @@
 
             .couple-area .couple-social-item {
                 display: block !important;
+                flex: 0 1 150px;
                 width: auto !important;
                 min-width: 0 !important;
                 height: auto !important;
@@ -272,6 +273,10 @@
                     min-height: 40px;
                     padding: 5px 7px;
                     gap: 6px;
+                }
+
+                .couple-area .couple-social-item {
+                    flex-basis: 136px;
                 }
 
                 .couple-area .couple-social-link i {
