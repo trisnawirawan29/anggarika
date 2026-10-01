@@ -309,7 +309,7 @@
                                 <div class="couple-text">
                                     <div class="couple-content">
                                         <h4 style="font-size: {{ (int) $landing['landing_groom_name_font_size'] }}px;{{ $landing['landing_groom_name_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_groom_name_font_family'].';' : '' }}">{{ $landing['landing_groom_name'] }}</h4>
-                                        <p style="white-space: pre-line;">{{ $landing['landing_groom_bio'] }}</p>
+                                        <p style="font-family: Georgia, serif; white-space: pre-line;">{{ $landing['landing_groom_bio'] }}</p>
                                     </div>
                                     <div class="couple-socials">
                                         <ul class="couple-social-list">
@@ -331,7 +331,7 @@
                                 <div class="couple-text">
                                     <div class="couple-content">
                                         <h4 style="font-size: {{ (int) $landing['landing_bride_name_font_size'] }}px;{{ $landing['landing_bride_name_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_bride_name_font_family'].';' : '' }}">{{ $landing['landing_bride_name'] }}</h4>
-                                        <p style="white-space: pre-line;">{{ $landing['landing_bride_bio'] }}</p>
+                                        <p style="font-family: Georgia, serif; white-space: pre-line;">{{ $landing['landing_bride_bio'] }}</p>
                                     </div>
                                     <div class="couple-socials">
                                         <ul class="couple-social-list">
