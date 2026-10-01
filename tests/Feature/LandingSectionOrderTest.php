@@ -130,6 +130,7 @@ class LandingSectionOrderTest extends TestCase
             ->put(route('admin.landing-settings.update'), [
                 'save_section' => 'gift',
                 'landing_section_gift' => '1',
+                'landing_gift_title' => 'Hadiah Pernikahan',
                 'landing_gift_description' => 'Terima kasih atas perhatian dan doa Anda.',
                 'landing_gift_bank_name' => 'Bank Mandiri',
                 'landing_gift_account_number' => '9876543210',
@@ -139,10 +140,12 @@ class LandingSectionOrderTest extends TestCase
 
         $this->assertSame('Bank Mandiri', Setting::value('landing_gift_bank_name'));
         $this->assertSame('9876543210', Setting::value('landing_gift_account_number'));
+        $this->assertSame('Hadiah Pernikahan', Setting::value('landing_gift_title'));
 
         $content = $this->get(route('landing'))->assertOk()->getContent();
 
         $this->assertStringContainsString('Terima kasih atas perhatian dan doa Anda.', $content);
+        $this->assertStringContainsString('Hadiah Pernikahan', $content);
         $this->assertStringContainsString('9876543210', $content);
         $this->assertStringContainsString('Angga &amp; Rika', $content);
     }

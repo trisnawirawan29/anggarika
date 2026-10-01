@@ -1275,6 +1275,11 @@
                 box-shadow: 0 0 0 3px rgba(133, 170, 186, .18);
             }
 
+            .rsvp-modern .rsvp-field::placeholder {
+                color: #8a9aa0;
+                opacity: 1;
+            }
+
             .rsvp-modern textarea.rsvp-field {
                 min-height: 118px;
                 resize: vertical;
@@ -1421,8 +1426,8 @@
                             @endif
                             <form action="{{ route('rsvp.messages.store') }}" method="POST" class="rsvp-message-form">
                                 @csrf
-                                <input type="text" name="name" class="rsvp-field" placeholder="Nama Anda" maxlength="80" value="{{ old('name') }}" required>
-                                <textarea name="message" class="rsvp-field" placeholder="Katakan sesuatu untuk pasangan..." maxlength="1000" required>{{ old('message') }}</textarea>
+                                <input type="text" name="name" class="rsvp-field" placeholder="Tuliskan nama lengkap Anda" maxlength="80" value="{{ old('name') }}" required>
+                                <textarea name="message" class="rsvp-field" placeholder="Tuliskan ucapan dan doa untuk pasangan..." maxlength="1000" required>{{ old('message') }}</textarea>
                                 <div class="text-center"><button type="submit" class="rsvp-submit"><i class="fa fa-paper-plane me-2" aria-hidden="true"></i>Kirim ucapan</button></div>
                             </form>
                             <h3 class="rsvp-messages-title">Ucapan &amp; Doa</h3>
@@ -1642,7 +1647,7 @@
             <div class="container">
                 <div class="col-12">
                     <div class="section-title text-center">
-                        <h2>Gift Registration</h2>
+                        <h2>{{ $landing['landing_gift_title'] }}</h2>
                     </div>
                     <p class="gift-description">{{ $landing['landing_gift_description'] }}</p>
                 </div>
