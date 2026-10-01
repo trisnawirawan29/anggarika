@@ -2,9 +2,7 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
 
 class LandingGalleryItem extends Model
 {
@@ -15,13 +13,5 @@ class LandingGalleryItem extends Model
         return [
             'sort_order' => 'integer',
         ];
-    }
-
-    /**
-     * @return Attribute<string, never>
-     */
-    protected function categorySlug(): Attribute
-    {
-        return Attribute::get(fn (): string => 'category-'.Str::slug($this->category));
     }
 }

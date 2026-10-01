@@ -451,12 +451,11 @@
     </form>
 </div>
 <div class="content-card mb-4">
-    <div class="section-title"><span class="section-number">08A</span><div><h5>Foto galeri</h5><p>Tambah foto tanpa batas dan tentukan kategori untuk setiap foto.</p></div></div>
+    <div class="section-title"><span class="section-number">08A</span><div><h5>Foto galeri</h5><p>Tambah foto galeri tanpa batas.</p></div></div>
     <form method="POST" action="{{ route('admin.landing-settings.gallery.store') }}" enctype="multipart/form-data" class="border rounded p-3 mb-4 bg-light">
         @csrf
         <div class="row g-3 align-items-end">
-            <div class="col-md-6"><label class="form-label">Foto baru</label><input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp" required></div>
-            <div class="col-md-4"><label class="form-label">Kategori</label><input type="text" name="category" class="form-control" placeholder="Contoh: Pre Wedding" maxlength="80" required></div>
+            <div class="col-md-10"><label class="form-label">Foto baru</label><input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp" required></div>
             <div class="col-md-2"><button class="btn btn-primary w-100" type="submit"><i class="fas fa-plus me-1"></i>Tambah</button></div>
         </div>
     </form>
@@ -471,8 +470,6 @@
                         <form method="POST" action="{{ route('admin.landing-settings.gallery.update', $galleryItem) }}" enctype="multipart/form-data">
                             @csrf
                             @method('PUT')
-                            <label class="form-label small">Kategori</label>
-                            <input type="text" name="category" class="form-control form-control-sm mb-2" value="{{ $galleryItem->category }}" maxlength="80" required>
                             <label class="form-label small">Ganti foto <span class="text-muted">(opsional)</span></label>
                             <input type="file" name="photo" class="form-control form-control-sm mb-3" accept="image/jpeg,image/png,image/webp">
                             <button class="btn btn-sm btn-outline-primary w-100" type="submit">Simpan</button>

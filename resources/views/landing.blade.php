@@ -817,7 +817,7 @@
                 display: inline-flex;
                 align-items: center;
                 gap: 8px;
-                margin-top: 14px;
+                margin-top: clamp(24px, 4vw, 48px);
                 padding: 10px 18px;
                 border-radius: 999px;
                 background: linear-gradient(135deg, #85aaba, #557f91);
@@ -1082,7 +1082,14 @@
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
+                margin-top: clamp(24px, 4vw, 48px);
                 height: auto !important;
+            }
+
+            @media (min-width: 992px) {
+                .gallery-section .gallery-centered {
+                    margin-top: clamp(52px, 5vw, 76px);
+                }
             }
 
             .gallery-section .gallery-centered .grid {
@@ -1124,19 +1131,11 @@
                 </div>
                 <div class="row">
                     <div class="col col-xs-12 sortable-gallery">
-                        <div class="gallery-filters">
-                            <ul>
-                                <li><a data-filter="*" href="#" class="current">All</a></li>
-                                @foreach ($galleryItems->unique('category_slug') as $galleryCategory)
-                                    <li><a data-filter=".{{ $galleryCategory['category_slug'] }}" href="#">{{ $galleryCategory['category'] }}</a></li>
-                                @endforeach
-                            </ul>
-                        </div>
                         <div class="gallery-container gallery-fancybox masonry-gallery gallery-centered">
                             @foreach ($galleryItems as $galleryItem)
-                                <div class="grid {{ $galleryItem['category_slug'] }}">
+                                <div class="grid">
                                     <a href="{{ $galleryItem['url'] }}" class="fancybox" data-fancybox-group="gall-1">
-                                        <img src="{{ $galleryItem['url'] }}" alt="{{ $galleryItem['category'] }}" class="img img-responsive">
+                                        <img src="{{ $galleryItem['url'] }}" alt="Foto galeri" class="img img-responsive">
                                         <div class="icon"><i class="ti-plus"></i></div>
                                     </a>
                                 </div>

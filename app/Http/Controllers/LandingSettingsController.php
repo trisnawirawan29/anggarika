@@ -462,12 +462,11 @@ class LandingSettingsController extends Controller
     {
         $data = $request->validate([
             'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'category' => ['required', 'string', 'max:80'],
         ]);
 
         LandingGalleryItem::query()->create([
             'image_path' => $request->file('photo')->store('landing/gallery', 'public'),
-            'category' => $data['category'],
+            'category' => 'Galeri',
             'sort_order' => (int) LandingGalleryItem::query()->max('sort_order') + 1,
         ]);
 
@@ -480,7 +479,6 @@ class LandingSettingsController extends Controller
     {
         $data = $request->validate([
             'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
-            'category' => ['required', 'string', 'max:80'],
         ]);
 
         if ($request->hasFile('photo')) {

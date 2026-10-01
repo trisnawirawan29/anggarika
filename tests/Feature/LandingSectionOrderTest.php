@@ -67,18 +67,17 @@ class LandingSectionOrderTest extends TestCase
         $this->actingAs($admin)
             ->post(route('admin.landing-settings.gallery.store'), [
                 'photo' => UploadedFile::fake()->create('engagement.jpg', 100, 'image/jpeg'),
-                'category' => 'Engagement',
             ])
             ->assertRedirect();
 
         $galleryItem = LandingGalleryItem::query()->firstOrFail();
-        $this->assertSame('Engagement', $galleryItem->category);
+        $this->assertSame('Galeri', $galleryItem->category);
         Storage::disk('public')->assertExists($galleryItem->image_path);
 
         $content = $this->get(route('landing'))->assertOk()->getContent();
 
-        $this->assertStringContainsString('data-filter=".category-engagement"', $content);
-        $this->assertStringContainsString('alt="Engagement"', $content);
+        $this->assertStringNotContainsString('gallery-filters', $content);
+        $this->assertStringContainsString('alt="Foto galeri"', $content);
     }
 
     public function test_admin_can_configure_each_event_and_hide_disabled_events(): void
