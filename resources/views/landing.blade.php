@@ -376,6 +376,26 @@
         @endif
         @if ($landing['landing_section_story'])
         <style>
+            .story-section .story-timeline > .row {
+                display: flex;
+                align-items: stretch;
+            }
+
+            .story-section .story-timeline .story-media {
+                display: flex;
+            }
+
+            .story-section .story-timeline .story-media .img-holder {
+                width: 100%;
+                height: 100%;
+            }
+
+            .story-section .story-timeline .story-media img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
             @media (max-width: 767px) {
                 .story-section .story-timeline > .row {
                     display: flex;
@@ -402,7 +422,7 @@
                 }
 
                 .story-section .story-timeline .story-media .img-holder {
-                    height: clamp(150px, 42vw, 220px);
+                    min-height: clamp(150px, 42vw, 220px);
                 }
 
                 .story-section .story-timeline .story-media img {
