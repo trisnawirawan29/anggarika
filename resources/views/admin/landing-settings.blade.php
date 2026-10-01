@@ -329,6 +329,8 @@
                 @if ($item['key'] === 'rsvp')
                     <label class="form-label">Judul RSVP</label>
                     <input name="landing_rsvp_title" class="form-control mb-3" value="{{ old('landing_rsvp_title', $settings['landing_rsvp_title'] ?? 'Be Our RSVP') }}" required>
+                    <label class="form-label">Deskripsi RSVP</label>
+                    <textarea name="landing_rsvp_description" class="form-control mb-3" rows="3" required>{{ old('landing_rsvp_description', $settings['landing_rsvp_description'] ?? 'Sampaikan doa dan ucapan terbaik Anda untuk menjadi bagian dari hari bahagia kami.') }}</textarea>
                 @endif
                 <div class="row g-4"><div class="col-6 col-md-3">
                     @php
@@ -495,6 +497,25 @@
             @endforeach
         </div>
     @endif
+</div>
+<div class="content-card mb-4">
+    <div class="section-title"><span class="section-number">08B</span><div><h5>Kelola ucapan RSVP</h5><p>Hapus ucapan yang tidak sesuai sebelum ditampilkan di landing page.</p></div></div>
+    <form method="GET" action="{{ route('admin.landing-settings') }}" class="row g-2 mb-3">
+        <div class="col-md-9"><label class="form-label small" for="rsvp_search">Cari nama atau isi ucapan</label><input id="rsvp_search" type="search" name="rsvp_search" class="form-control" value="{{ $rsvpMessageSearch }}" placeholder="Contoh: doa atau nama tamu"></div>
+        <div class="col-md-3 d-flex align-items-end gap-2"><button class="btn btn-outline-primary flex-grow-1" type="submit"><i class="fas fa-search me-1"></i>Cari</button>@if ($rsvpMessageSearch !== '')<a href="{{ route('admin.landing-settings') }}" class="btn btn-outline-secondary">Reset</a>@endif</div>
+    </form>
+    @forelse ($rsvpMessages as $rsvpMessage)
+        <div class="d-flex align-items-start gap-3 border rounded p-3 mb-2">
+            <div class="flex-grow-1"><div class="d-flex justify-content-between gap-2"><strong>{{ $rsvpMessage->name }}</strong><small class="text-muted">{{ $rsvpMessage->created_at->format('d M Y, H:i') }}</small></div><p class="mb-0 mt-1 text-muted" style="white-space:pre-line">{{ $rsvpMessage->message }}</p></div>
+            <form method="POST" action="{{ route('admin.rsvp.messages.destroy', $rsvpMessage) }}" onsubmit="return confirm('Hapus ucapan ini?')">
+                @csrf
+                @method('DELETE')
+                <button class="btn btn-sm btn-outline-danger" type="submit" aria-label="Hapus ucapan"><i class="fas fa-trash"></i></button>
+            </form>
+        </div>
+    @empty
+        <div class="alert alert-info mb-0">Belum ada ucapan RSVP.</div>
+    @endforelse
 </div>
 <script>
     (() => {

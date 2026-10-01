@@ -9,10 +9,14 @@ use App\Http\Controllers\GoogleAuthController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LandingSettingsController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RsvpMessageController;
 use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class)->name('landing');
+Route::post('/rsvp/messages', [RsvpMessageController::class, 'store'])
+    ->middleware('throttle:10,1')
+    ->name('rsvp.messages.store');
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.attempt');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
@@ -55,6 +59,7 @@ Route::middleware('auth')->group(function () {
         Route::post('/landing-settings/gallery', [LandingSettingsController::class, 'storeGalleryItem'])->name('landing-settings.gallery.store');
         Route::put('/landing-settings/gallery/{galleryItem}', [LandingSettingsController::class, 'updateGalleryItem'])->name('landing-settings.gallery.update');
         Route::delete('/landing-settings/gallery/{galleryItem}', [LandingSettingsController::class, 'destroyGalleryItem'])->name('landing-settings.gallery.destroy');
+        Route::delete('/rsvp/messages/{rsvpMessage}', [RsvpMessageController::class, 'destroy'])->name('rsvp.messages.destroy');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs');
     });
 });

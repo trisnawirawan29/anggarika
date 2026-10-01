@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\LandingGalleryItem;
 use App\Models\Role;
+use App\Models\RsvpMessage;
 use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -144,6 +145,60 @@ class LandingSectionOrderTest extends TestCase
         $this->assertStringContainsString('Terima kasih atas perhatian dan doa Anda.', $content);
         $this->assertStringContainsString('9876543210', $content);
         $this->assertStringContainsString('Angga &amp; Rika', $content);
+    }
+
+    public function test_guest_can_submit_rsvp_message_and_latest_messages_are_displayed_first(): void
+    {
+        RsvpMessage::query()->create(['name' => 'Pesan Lama', 'message' => 'Ucapan lama.']);
+
+        $this->post(route('rsvp.messages.store'), [
+            'name' => 'Pesan Baru',
+            'message' => 'Semoga bahagia selalu.',
+        ])->assertRedirect(route('landing').'#rsvp');
+
+        $this->assertDatabaseHas('rsvp_messages', [
+            'name' => 'Pesan Baru',
+            'message' => 'Semoga bahagia selalu.',
+        ]);
+
+        $content = $this->get(route('landing'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Sampaikan doa dan ucapan terbaik Anda', $content);
+        $this->assertStringContainsString('Pesan Baru', $content);
+        $this->assertStringContainsString('Pesan Lama', $content);
+        $this->assertLessThan(
+            strpos($content, 'Pesan Lama'),
+            strpos($content, 'Pesan Baru'),
+        );
+    }
+
+    public function test_admin_can_delete_an_rsvp_message(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+        $message = RsvpMessage::query()->create(['name' => 'Tamu', 'message' => 'Ucapan untuk dihapus.']);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.rsvp.messages.destroy', $message))
+            ->assertRedirect();
+
+        $this->assertDatabaseMissing('rsvp_messages', ['id' => $message->id]);
+    }
+
+    public function test_admin_can_search_rsvp_messages_by_name_or_content(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+        RsvpMessage::query()->create(['name' => 'Budi', 'message' => 'Semoga langgeng.']);
+        RsvpMessage::query()->create(['name' => 'Sari', 'message' => 'Selamat menempuh hidup baru.']);
+
+        $content = $this->actingAs($admin)
+            ->get(route('admin.landing-settings', ['rsvp_search' => 'Budi']))
+            ->assertOk()
+            ->getContent();
+
+        $this->assertStringContainsString('Semoga langgeng.', $content);
+        $this->assertStringNotContainsString('Selamat menempuh hidup baru.', $content);
     }
 
     public function test_admin_can_configure_the_schedule_card_count(): void

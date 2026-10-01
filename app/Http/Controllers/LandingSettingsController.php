@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\LandingGalleryItem;
+use App\Models\RsvpMessage;
 use App\Models\Setting;
 use App\Support\AuditLogger;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -34,7 +36,7 @@ class LandingSettingsController extends Controller
 
     private const LANDING_AUDIO_KEYS = ['landing_music_file'];
 
-    public function edit(): View
+    public function edit(Request $request): View
     {
         $settings = Setting::query()->pluck('value', 'key');
         $sectionOrder = $this->sectionOrder($settings->get('landing_section_order'));
@@ -42,8 +44,19 @@ class LandingSettingsController extends Controller
             ->orderBy('sort_order')
             ->orderBy('id')
             ->get();
+        $rsvpMessageSearch = $request->string('rsvp_search')->trim()->toString();
+        $rsvpMessages = RsvpMessage::query()
+            ->when($rsvpMessageSearch !== '', function (Builder $query) use ($rsvpMessageSearch): void {
+                $query->where(function (Builder $query) use ($rsvpMessageSearch): void {
+                    $query
+                        ->where('name', 'like', '%'.$rsvpMessageSearch.'%')
+                        ->orWhere('message', 'like', '%'.$rsvpMessageSearch.'%');
+                });
+            })
+            ->latest()
+            ->get();
 
-        return view('admin.landing-settings', compact('settings', 'sectionOrder', 'galleryItems'));
+        return view('admin.landing-settings', compact('settings', 'sectionOrder', 'galleryItems', 'rsvpMessages', 'rsvpMessageSearch'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -86,6 +99,7 @@ class LandingSettingsController extends Controller
             ...array_fill_keys(array_map(fn (int $number): string => 'landing_event_'.$number.'_enabled', range(1, 4)), ['required', 'boolean']),
             'landing_people_title' => ['required', 'string', 'max:120'],
             'landing_gallery_title' => ['required', 'string', 'max:120'],
+            'landing_rsvp_description' => ['required', 'string', 'max:1000'],
             'landing_gift_description' => ['required', 'string', 'max:1000'],
             'landing_gift_bank_name' => ['required', 'string', 'max:80'],
             'landing_gift_account_number' => ['required', 'string', 'max:40'],
@@ -156,6 +170,10 @@ class LandingSettingsController extends Controller
             ],
             'people' => [
                 'landing_people_title' => ['type' => 'string', 'max' => 120],
+            ],
+            'rsvp' => [
+                'landing_rsvp_title' => ['type' => 'string', 'max' => 120],
+                'landing_rsvp_description' => ['type' => 'string', 'max' => 1000],
             ],
             'gift' => [
                 'landing_gift_description' => ['type' => 'string', 'max' => 1000],
@@ -329,7 +347,7 @@ class LandingSettingsController extends Controller
             ],
             'countdown' => ['landing_section_countdown', 'landing_countdown_date', 'landing_countdown_background'],
             'cta' => ['landing_section_cta', 'landing_cta_title', 'landing_cta_title_font_size', 'landing_cta_title_font_family', 'landing_cta_text', 'landing_cta_text_font_size', 'landing_cta_text_font_family', 'landing_cta_rsvp_label', 'landing_cta_rsvp_url', 'landing_cta_location_label', 'landing_cta_location_url', 'landing_cta_rsvp_enabled', 'landing_cta_location_enabled', 'landing_cta_background'],
-            'rsvp' => ['landing_section_rsvp', 'landing_rsvp_title', 'landing_rsvp_background'],
+            'rsvp' => ['landing_section_rsvp', 'landing_rsvp_title', 'landing_rsvp_description', 'landing_rsvp_background'],
             'story' => ['landing_section_story', 'landing_story_title', ...array_merge(
                 ...array_map(fn (int $number): array => [
                     'landing_story_'.$number.'_enabled',

@@ -1224,7 +1224,185 @@
 
         @if ($landing['landing_section_rsvp'])
         <!-- rsvp-area strat -->
-        <div id="rsvp" class="rsvp-area go-rsvp-area" data-landing-section="rsvp" style="background-image: url('{{ $landing['landing_rsvp_background'] }}');">
+        <style>
+            .rsvp-modern .rsvp-wrap {
+                padding: clamp(32px, 5vw, 58px);
+                border-radius: 24px;
+                background: rgba(255, 255, 255, .94);
+                box-shadow: 0 18px 42px rgba(56, 92, 105, .16);
+            }
+
+            .rsvp-modern .section-title {
+                margin-bottom: 70px;
+            }
+
+            .rsvp-modern .section-title h2 {
+                color: #557f91;
+            }
+
+            .rsvp-modern .rsvp-description {
+                max-width: 680px;
+                margin: 0 auto 34px;
+                color: #666;
+                font-family: Georgia, serif;
+                line-height: 1.8;
+                text-align: center;
+            }
+
+            .rsvp-modern .rsvp-message-form {
+                margin-bottom: clamp(34px, 6vw, 58px);
+                padding: clamp(20px, 4vw, 34px);
+                border: 1px solid rgba(133, 170, 186, .28);
+                border-radius: 18px;
+                background: #f8fbfc;
+            }
+
+            .rsvp-modern .rsvp-field {
+                width: 100%;
+                margin-bottom: 16px;
+                padding: 14px 16px;
+                border: 1px solid rgba(133, 170, 186, .45);
+                border-radius: 10px;
+                background: #fff;
+                color: #557f91;
+                font-family: inherit;
+                outline: none;
+                transition: border-color .2s ease, box-shadow .2s ease;
+            }
+
+            .rsvp-modern .rsvp-field:focus {
+                border-color: #557f91;
+                box-shadow: 0 0 0 3px rgba(133, 170, 186, .18);
+            }
+
+            .rsvp-modern textarea.rsvp-field {
+                min-height: 118px;
+                resize: vertical;
+            }
+
+            .rsvp-modern .rsvp-submit {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 12px 26px;
+                border: 0;
+                border-radius: 999px;
+                background: linear-gradient(135deg, #85aaba, #557f91);
+                color: #fff;
+                font-weight: 600;
+                box-shadow: 0 9px 18px rgba(56, 92, 105, .2);
+                transition: transform .2s ease, box-shadow .2s ease;
+            }
+
+            .rsvp-modern .rsvp-submit:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 13px 24px rgba(56, 92, 105, .28);
+            }
+
+            .rsvp-modern .rsvp-feedback {
+                margin-bottom: 18px;
+                padding: 12px 16px;
+                border-radius: 10px;
+                background: #e8f5ed;
+                color: #277344;
+                text-align: center;
+            }
+
+            .rsvp-modern .rsvp-errors {
+                background: #fff0f0;
+                color: #9b3d3d;
+            }
+
+            .rsvp-modern .rsvp-messages-title {
+                margin: 0 0 22px;
+                color: #557f91;
+                font-family: 'Great Vibes', cursive;
+                font-size: 34px;
+                text-align: center;
+            }
+
+            .rsvp-modern .rsvp-message-list {
+                display: grid;
+                gap: 14px;
+            }
+
+            .rsvp-modern .rsvp-message-card {
+                display: flex;
+                gap: 14px;
+                padding: 18px;
+                border: 1px solid rgba(133, 170, 186, .24);
+                border-radius: 15px;
+                background: #fff;
+                box-shadow: 0 8px 18px rgba(56, 92, 105, .08);
+            }
+
+            .rsvp-modern .rsvp-message-avatar {
+                display: flex;
+                flex: 0 0 42px;
+                align-items: center;
+                justify-content: center;
+                width: 42px;
+                height: 42px;
+                border-radius: 50%;
+                background: #85aaba;
+                color: #fff;
+                font-weight: 700;
+            }
+
+            .rsvp-modern .rsvp-message-meta {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                gap: 12px;
+                margin-bottom: 5px;
+            }
+
+            .rsvp-modern .rsvp-message-meta strong {
+                color: #557f91;
+            }
+
+            .rsvp-modern .rsvp-message-meta small {
+                color: #999;
+                white-space: nowrap;
+            }
+
+            .rsvp-modern .rsvp-message-text {
+                margin: 0;
+                color: #666;
+                font-family: Georgia, serif;
+                line-height: 1.65;
+                white-space: pre-line;
+            }
+
+            .rsvp-modern .rsvp-pagination {
+                margin-top: 26px;
+                text-align: center;
+            }
+
+            @media (max-width: 767px) {
+                .rsvp-modern .rsvp-wrap {
+                    padding: 24px 16px;
+                }
+
+                .rsvp-modern .section-title {
+                    margin-bottom: 60px;
+                }
+
+                .rsvp-modern .rsvp-description {
+                    margin-top: 0;
+                }
+
+                .rsvp-modern .rsvp-message-meta {
+                    display: block;
+                }
+
+                .rsvp-modern .rsvp-message-meta small {
+                    display: block;
+                    margin-top: 3px;
+                }
+            }
+        </style>
+        <div id="rsvp" class="rsvp-area rsvp-modern go-rsvp-area" data-landing-section="rsvp" style="background-image: url('{{ $landing['landing_rsvp_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="col-md-8 col-md-offset-2 col-sm-10 col-sm-offset-1">
@@ -1234,46 +1412,36 @@
                                     <h2>{{ $landing['landing_rsvp_title'] }}</h2>
                                 </div>
                             </div>
-                            <div class="contact-form form-style">
-                                <form id="rsvp-form" action="mail.php" class="validate-rsvp-form" method="post">
-                                    <div class="row">
-                                        <div class="col-12 col-sm-6">
-                                            <input type="text" placeholder="Your Name*" id="fname" name="name">
+                            <p class="rsvp-description">{{ $landing['landing_rsvp_description'] }}</p>
+                            @if (session('rsvp_success'))
+                                <div class="rsvp-feedback">{{ session('rsvp_success') }}</div>
+                            @endif
+                            @if ($errors->has('name') || $errors->has('message'))
+                                <div class="rsvp-feedback rsvp-errors">{{ $errors->first('name') ?: $errors->first('message') }}</div>
+                            @endif
+                            <form action="{{ route('rsvp.messages.store') }}" method="POST" class="rsvp-message-form">
+                                @csrf
+                                <input type="text" name="name" class="rsvp-field" placeholder="Nama Anda" maxlength="80" value="{{ old('name') }}" required>
+                                <textarea name="message" class="rsvp-field" placeholder="Katakan sesuatu untuk pasangan..." maxlength="1000" required>{{ old('message') }}</textarea>
+                                <div class="text-center"><button type="submit" class="rsvp-submit"><i class="fa fa-paper-plane me-2" aria-hidden="true"></i>Kirim ucapan</button></div>
+                            </form>
+                            <h3 class="rsvp-messages-title">Ucapan &amp; Doa</h3>
+                            <div class="rsvp-message-list">
+                                @forelse ($rsvpMessages as $rsvpMessage)
+                                    <article class="rsvp-message-card">
+                                        <div class="rsvp-message-avatar" aria-hidden="true">{{ strtoupper(substr($rsvpMessage->name, 0, 1)) }}</div>
+                                        <div class="flex-grow-1">
+                                            <div class="rsvp-message-meta"><strong>{{ $rsvpMessage->name }}</strong><small>{{ $rsvpMessage->created_at->format('d M Y, H:i') }}</small></div>
+                                            <p class="rsvp-message-text">{{ $rsvpMessage->message }}</p>
                                         </div>
-                                        <div class="col-12  col-sm-6">
-                                            <input type="text" placeholder="Your Email*" id="email" name="email">
-                                        </div>
-                                        <div class="col col-sm-6">
-                                            <select class="form-control" name="rsvp">
-                                                <option disabled selected>Number Of rsvp*</option>
-                                                <option>1</option>
-                                                <option>2</option>
-                                                <option>3</option>
-                                                <option>4</option>
-                                            </select>
-                                        </div>
-                                        <div class="col col-sm-6">
-                                            <select class="form-control" name="events">
-                                                <option disabled selected>I Am Attending*</option>
-                                                <option>Al events</option>
-                                                <option>Wedding ceremony</option>
-                                                <option>Reception party</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-12 col-sm-12">
-                                            <textarea class="contact-textarea" placeholder="Message" name="notes"></textarea>
-                                        </div>
-                                        <div class="col-12 text-center">
-                                            <button id="submit" class="submit">Send Invitation</button>
-                                            <span id="loader"><i class="fa fa-refresh fa-spin fa-3x fa-fw"></i></span>
-                                        </div>
-                                         <div class="col col-md-12 success-error-message">
-                                            <div id="success">Thank you</div>
-                                            <div id="error"> Error occurred while sending email. Please try again later. </div>
-                                        </div>
-                                    </div>
-                                </form>
+                                    </article>
+                                @empty
+                                    <p class="rsvp-message-text text-center">Belum ada ucapan. Jadilah yang pertama memberikan doa.</p>
+                                @endforelse
                             </div>
+                            @if ($rsvpMessages->hasPages())
+                                <div class="rsvp-pagination">{{ $rsvpMessages->links() }}</div>
+                            @endif
                         </div>
                     </div>
                 </div>
