@@ -469,7 +469,6 @@
                                 <div class="col col-md-6 story-copy">
                                     <div class="story-text right-align-text">
                                         <h3>{{ $landing['landing_story_1_title'] }}</h3>
-                                        <span class="date">{{ $landing['landing_story_1_date'] }}</span>
                                         <p>{{ $landing['landing_story_1_text'] }}</p>
                                     </div>
                                 </div>
@@ -493,7 +492,6 @@
                                     </span>
                                     <div class="story-text">
                                         <h3>{{ $landing['landing_story_2_title'] }}</h3>
-                                        <span class="date">{{ $landing['landing_story_2_date'] }}</span>
                                         <p>{{ $landing['landing_story_2_text'] }}</p>
                                     </div>
                                 </div>
@@ -507,7 +505,6 @@
                                     </span>
                                     <div class="story-text right-align-text">
                                         <h3>{{ $landing['landing_story_3_title'] }}</h3>
-                                        <span class="date">{{ $landing['landing_story_3_date'] }}</span>
                                         <p>{{ $landing['landing_story_3_text'] }}</p>
                                     </div>
                                 </div>
@@ -521,16 +518,8 @@
                             @if ($landing['landing_story_4_enabled'])
                             <div class="row">
                                 <div class="col col-md-6 story-media">
-                                    <div class="img-holder video-holder">
+                                    <div class="img-holder">
                                         <img src="{{ $landing['landing_story_photo_4'] }}" alt class="img img-responsive">
-                                        <div class="video-btn">
-                                            <ul>
-                                                <li><a href="https://www.youtube.com/embed/uQBL7pSAXR8?autoplay=1" class="video-btn" data-type="iframe">
-                                                <i class="fi flaticon-play-button"></i>
-                                                </a>
-                                                </li>
-                                            </ul>
-                                        </div>
                                     </div>
                                 </div>
                                 <div class="col col-md-6 text-holder story-copy">
@@ -539,7 +528,6 @@
                                     </span>
                                     <div class="story-text">
                                         <h3>{{ $landing['landing_story_4_title'] }}</h3>
-                                        <span class="date">{{ $landing['landing_story_4_date'] }}</span>
                                         <p>{{ $landing['landing_story_4_text'] }}</p>
                                     </div>
                                 </div>
