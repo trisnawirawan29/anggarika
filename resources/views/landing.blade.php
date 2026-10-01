@@ -798,6 +798,20 @@
                 color: #85aaba;
             }
 
+            .schedule-section .schedule-card .schedule-address {
+                display: flex;
+                align-items: flex-start;
+                gap: 6px;
+                margin-top: 6px;
+                text-align: left;
+                line-height: 1.35;
+            }
+
+            .schedule-section .schedule-card .schedule-address i {
+                flex: 0 0 34px;
+                margin-right: 0;
+            }
+
             .schedule-section .schedule-location-button {
                 display: inline-flex;
                 align-items: center;
@@ -855,7 +869,7 @@
                             <h3>{{ $landing['landing_schedule_'.$number.'_name'] }}</h3>
                             <p><i class="fa fa-calendar" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_date'] }}</p>
                             <p><i class="fa fa-clock-o" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_time'] }}</p>
-                            <p><i class="fa fa-map-marker" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_location'] }}</p>
+                            <p class="schedule-address"><i class="fa fa-map-marker" aria-hidden="true"></i><span>{{ $landing['landing_schedule_'.$number.'_location'] }}</span></p>
                             @if ($landing['landing_schedule_'.$number.'_location_enabled'])
                                 <a class="schedule-location-button popup-gmaps" href="{{ $landing['landing_schedule_'.$number.'_location_url'] }}"><i class="fa fa-map-marker" aria-hidden="true"></i>Lihat lokasi</a>
                             @endif
