@@ -52,6 +52,9 @@ Route::middleware('auth')->group(function () {
         Route::get('/landing-settings', [LandingSettingsController::class, 'edit'])->name('landing-settings');
         Route::put('/landing-settings', [LandingSettingsController::class, 'update'])->name('landing-settings.update');
         Route::post('/landing-settings/photo', [LandingSettingsController::class, 'uploadPhoto'])->name('landing-settings.photo');
+        Route::post('/landing-settings/gallery', [LandingSettingsController::class, 'storeGalleryItem'])->name('landing-settings.gallery.store');
+        Route::put('/landing-settings/gallery/{galleryItem}', [LandingSettingsController::class, 'updateGalleryItem'])->name('landing-settings.gallery.update');
+        Route::delete('/landing-settings/gallery/{galleryItem}', [LandingSettingsController::class, 'destroyGalleryItem'])->name('landing-settings.gallery.destroy');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs');
     });
 });

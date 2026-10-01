@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\LandingGalleryItem;
 use App\Models\Role;
 use App\Models\Setting;
 use App\Models\User;
@@ -55,6 +56,29 @@ class LandingSectionOrderTest extends TestCase
             ->assertJsonStructure(['url']);
 
         Storage::disk('public')->assertExists((string) Setting::value('landing_music_file'));
+    }
+
+    public function test_admin_can_add_gallery_photos_with_categories(): void
+    {
+        Storage::fake('public');
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.landing-settings.gallery.store'), [
+                'photo' => UploadedFile::fake()->create('engagement.jpg', 100, 'image/jpeg'),
+                'category' => 'Engagement',
+            ])
+            ->assertRedirect();
+
+        $galleryItem = LandingGalleryItem::query()->firstOrFail();
+        $this->assertSame('Engagement', $galleryItem->category);
+        Storage::disk('public')->assertExists($galleryItem->image_path);
+
+        $content = $this->get(route('landing'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('data-filter=".category-engagement"', $content);
+        $this->assertStringContainsString('alt="Engagement"', $content);
     }
 
     public function test_admin_can_configure_each_event_and_hide_disabled_events(): void

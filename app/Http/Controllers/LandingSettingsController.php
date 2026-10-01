@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LandingGalleryItem;
 use App\Models\Setting;
 use App\Support\AuditLogger;
 use Illuminate\Http\JsonResponse;
@@ -37,8 +38,12 @@ class LandingSettingsController extends Controller
     {
         $settings = Setting::query()->pluck('value', 'key');
         $sectionOrder = $this->sectionOrder($settings->get('landing_section_order'));
+        $galleryItems = LandingGalleryItem::query()
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
 
-        return view('admin.landing-settings', compact('settings', 'sectionOrder'));
+        return view('admin.landing-settings', compact('settings', 'sectionOrder', 'galleryItems'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -451,5 +456,51 @@ class LandingSettingsController extends Controller
         AuditLogger::record('landing_photo.updated', 'Foto landing page diperbarui.', null, [], ['key' => $data['photo_key']]);
 
         return response()->json(['url' => asset('storage/'.$newPhoto)]);
+    }
+
+    public function storeGalleryItem(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'photo' => ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'category' => ['required', 'string', 'max:80'],
+        ]);
+
+        LandingGalleryItem::query()->create([
+            'image_path' => $request->file('photo')->store('landing/gallery', 'public'),
+            'category' => $data['category'],
+            'sort_order' => (int) LandingGalleryItem::query()->max('sort_order') + 1,
+        ]);
+
+        AuditLogger::record('landing_gallery.created', 'Foto galeri landing page ditambahkan.');
+
+        return back()->with('success', 'Foto galeri berhasil ditambahkan.');
+    }
+
+    public function updateGalleryItem(Request $request, LandingGalleryItem $galleryItem): RedirectResponse
+    {
+        $data = $request->validate([
+            'photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'category' => ['required', 'string', 'max:80'],
+        ]);
+
+        if ($request->hasFile('photo')) {
+            $newPhoto = $request->file('photo')->store('landing/gallery', 'public');
+            Storage::disk('public')->delete($galleryItem->image_path);
+            $data['image_path'] = $newPhoto;
+        }
+
+        $galleryItem->update($data);
+        AuditLogger::record('landing_gallery.updated', 'Foto galeri landing page diperbarui.', $galleryItem);
+
+        return back()->with('success', 'Foto galeri berhasil diperbarui.');
+    }
+
+    public function destroyGalleryItem(LandingGalleryItem $galleryItem): RedirectResponse
+    {
+        Storage::disk('public')->delete($galleryItem->image_path);
+        $galleryItem->delete();
+        AuditLogger::record('landing_gallery.deleted', 'Foto galeri landing page dihapus.', $galleryItem);
+
+        return back()->with('success', 'Foto galeri berhasil dihapus.');
     }
 }

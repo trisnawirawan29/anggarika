@@ -1058,6 +1058,48 @@
         @endif
         @if ($landing['landing_section_gallery'])
         <!--Start project area-->  
+        <style>
+            .gallery-section .masonry-gallery .grid {
+                width: 25%;
+            }
+
+            .gallery-section .gallery-centered {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                height: auto !important;
+            }
+
+            .gallery-section .gallery-centered .grid {
+                position: relative !important;
+                top: auto !important;
+                left: auto !important;
+                float: none !important;
+                transform: none !important;
+            }
+
+            .gallery-section .masonry-gallery .grid img {
+                height: 220px;
+                object-fit: cover;
+                border-radius: 12px;
+            }
+
+            @media (max-width: 767px) {
+                .gallery-section .masonry-gallery .grid {
+                    width: 50%;
+                }
+
+                .gallery-section .masonry-gallery .grid img {
+                    height: 170px;
+                }
+            }
+
+            @media (max-width: 550px) {
+                .gallery-section .masonry-gallery .grid {
+                    width: 100%;
+                }
+            }
+        </style>
         <section id="gallery" class="gallery-section section-padding" data-landing-section="gallery">
             <div class="container">
                 <div class="col-l2">
@@ -1070,66 +1112,20 @@
                         <div class="gallery-filters">
                             <ul>
                                 <li><a data-filter="*" href="#" class="current">All</a></li>
-                                <li><a data-filter=".Pre-Wedding" href="#">Pre Wedding</a></li>
-                                <li><a data-filter=".EnagagEment" href="#">EnagagEment</a></li>
-                                <li><a data-filter=".PartIes" href="#">Parties</a></li>         
+                                @foreach ($galleryItems->unique('category_slug') as $galleryCategory)
+                                    <li><a data-filter=".{{ $galleryCategory['category_slug'] }}" href="#">{{ $galleryCategory['category'] }}</a></li>
+                                @endforeach
                             </ul>
                         </div>
-                        <div class="gallery-container gallery-fancybox masonry-gallery">
-                            <div class="grid EnagagEment PartIes">
-                                <a href="{{ $landing['landing_gallery_photo_1'] }}" class="fancybox" data-fancybox-group="gall-1">
-                                    <img src="{{ $landing['landing_gallery_photo_1'] }}" alt class="img img-responsive">
-                                    <div class="icon">
-                                        <i class="ti-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="grid Pre-Wedding EnagagEment PartIes">
-                                <a href="{{ $landing['landing_gallery_photo_2'] }}" class="fancybox" data-fancybox-group="gall-1">
-                                    <img src="{{ $landing['landing_gallery_photo_2'] }}" alt class="img img-responsive">
-                                    <div class="icon">
-                                        <i class="ti-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="grid EnagagEment">
-                                <a href="{{ $landing['landing_gallery_photo_3'] }}" class="fancybox" data-fancybox-group="gall-1">
-                                    <img src="{{ $landing['landing_gallery_photo_3'] }}" alt class="img img-responsive">
-                                    <div class="icon">
-                                        <i class="ti-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="grid Pre-Wedding PartIes">
-                                <a href="{{ $landing['landing_gallery_photo_4'] }}" class="fancybox" data-fancybox-group="gall-1">
-                                    <img src="{{ $landing['landing_gallery_photo_4'] }}" alt class="img img-responsive">
-                                    <div class="icon">
-                                        <i class="ti-plus"></i>
-                                    </div>
-                                </a>
-                            </div>
-                            <div class="grid EnagagEment">
-                                <a href="{{ $landing['landing_gallery_photo_5'] }}" class="fancybox" data-fancybox-group="gall-1">
-                                    <img src="{{ $landing['landing_gallery_photo_5'] }}" alt class="img img-responsive">
-                                    <div class="icon">
-                                        <i class="ti-plus"></i>
-                                    </div>
-                                </a>
-                                
-                            </div>
-                            <div class="grid Pre-Wedding EnagagEment PartIes">
-                                <img src="{{ $landing['landing_gallery_photo_6'] }}" alt class="img img-responsive">
-                                <div class="icon">
-                                    <div class="video-btn">
-                                        <ul>
-                                            <li><a href="https://www.youtube.com/embed/uQBL7pSAXR8?autoplay=1" class="video-btn" data-type="iframe">
-                                            <i class="fi flaticon-play-button"></i>
-                                            </a>
-                                            </li>
-                                        </ul>
-                                    </div>
+                        <div class="gallery-container gallery-fancybox masonry-gallery gallery-centered">
+                            @foreach ($galleryItems as $galleryItem)
+                                <div class="grid {{ $galleryItem['category_slug'] }}">
+                                    <a href="{{ $galleryItem['url'] }}" class="fancybox" data-fancybox-group="gall-1">
+                                        <img src="{{ $galleryItem['url'] }}" alt="{{ $galleryItem['category'] }}" class="img img-responsive">
+                                        <div class="icon"><i class="ti-plus"></i></div>
+                                    </a>
                                 </div>
-                            </div>
+                            @endforeach
                         </div>
                     </div>
                 </div> <!-- end row -->

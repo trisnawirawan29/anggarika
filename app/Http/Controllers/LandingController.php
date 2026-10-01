@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LandingGalleryItem;
 use App\Models\Setting;
 use Illuminate\View\View;
 
@@ -243,6 +244,31 @@ class LandingController extends Controller
             ? ''
             : (str_starts_with($musicFile, 'landing/') ? asset('storage/'.$musicFile) : asset($musicFile));
 
-        return view('landing', compact('landing'));
+        $galleryItems = LandingGalleryItem::query()
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->map(fn (LandingGalleryItem $item): array => [
+                'url' => asset('storage/'.$item->image_path),
+                'category' => $item->category,
+                'category_slug' => $item->category_slug,
+            ]);
+
+        if ($galleryItems->isEmpty()) {
+            $galleryItems = collect([
+                ['key' => 'landing_gallery_photo_1', 'category' => 'Engagement'],
+                ['key' => 'landing_gallery_photo_2', 'category' => 'Pre Wedding'],
+                ['key' => 'landing_gallery_photo_3', 'category' => 'Engagement'],
+                ['key' => 'landing_gallery_photo_4', 'category' => 'Parties'],
+                ['key' => 'landing_gallery_photo_5', 'category' => 'Engagement'],
+                ['key' => 'landing_gallery_photo_6', 'category' => 'Pre Wedding'],
+            ])->map(fn (array $item): array => [
+                'url' => $landing[$item['key']],
+                'category' => $item['category'],
+                'category_slug' => 'category-'.str($item['category'])->slug(),
+            ]);
+        }
+
+        return view('landing', compact('landing', 'galleryItems'));
     }
 }

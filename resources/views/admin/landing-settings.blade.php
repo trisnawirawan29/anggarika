@@ -432,7 +432,7 @@
             </div>
         </div>
 
-        <div class="content-card mb-4"><div class="section-title"><span class="section-number">08</span><div><h5>Galeri</h5><p>Judul dan foto galeri.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_gallery" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_gallery" name="landing_section_gallery" value="1" @checked(old('landing_section_gallery', $settings['landing_section_gallery'] ?? '1'))><label class="form-check-label" for="landing_section_gallery">Tampilkan galeri</label></div><label class="form-label">Judul galeri</label><input name="landing_gallery_title" class="form-control mb-3" value="{{ old('landing_gallery_title', $settings['landing_gallery_title'] ?? 'Our Gallery') }}" required><div class="row g-4">@foreach ([1, 2, 3, 4, 5, 6] as $number)@php($item = $photo('landing_gallery_photo_'.$number, 'Galeri '.$number, 'assets/images/gallery/img-'.$number.'.jpg'))<div class="col-6 col-md-3"><img src="{{ $photoUrl($item) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">{{ $item['label'] }}</label><input type="file" name="{{ $item['key'] }}" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div>@endforeach</div></div>
+        <div class="content-card mb-4"><div class="section-title"><span class="section-number">08</span><div><h5>Galeri</h5><p>Atur judul dan status section galeri.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_gallery" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_gallery" name="landing_section_gallery" value="1" @checked(old('landing_section_gallery', $settings['landing_section_gallery'] ?? '1'))><label class="form-check-label" for="landing_section_gallery">Tampilkan galeri</label></div><label class="form-label">Judul galeri</label><input name="landing_gallery_title" class="form-control" value="{{ old('landing_gallery_title', $settings['landing_gallery_title'] ?? 'Our Gallery') }}" required></div>
 
         @foreach ([['key' => 'gta', 'title' => 'Informasi perjalanan', 'label' => 'Tampilkan informasi perjalanan'], ['key' => 'gift', 'title' => 'Gift registration', 'label' => 'Tampilkan gift registration'], ['key' => 'music', 'title' => 'Music player', 'label' => 'Tampilkan music player']] as $item)<div class="content-card mb-4"><div class="section-title"><span class="section-number">08</span><div><h5>{{ $item['title'] }}</h5><p>Pengaturan section {{ $item['title'] }}.</p></div></div><div class="form-check form-switch"><input type="hidden" name="landing_section_{{ $item['key'] }}" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_{{ $item['key'] }}" name="landing_section_{{ $item['key'] }}" value="1" @checked(old('landing_section_'.$item['key'], $settings['landing_section_'.$item['key']] ?? '1'))><label class="form-check-label" for="landing_section_{{ $item['key'] }}">{{ $item['label'] }}</label></div></div>@endforeach
 
@@ -449,6 +449,44 @@
         <div class="content-card mb-4"><div class="section-title"><span class="section-number">09</span><div><h5>Footer</h5><p>Judul penutup dan background footer.</p></div></div><div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_footer" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_footer" name="landing_section_footer" value="1" @checked(old('landing_section_footer', $settings['landing_section_footer'] ?? '1'))><label class="form-check-label" for="landing_section_footer">Tampilkan footer</label></div><label class="form-label">Judul footer</label><input name="landing_footer_title" class="form-control mb-3" value="{{ old('landing_footer_title', $settings['landing_footer_title'] ?? 'Millar & Aliza Forever') }}" required><div class="row g-4"><div class="col-6 col-md-3"><img src="{{ $photoUrl($photo('landing_footer_background', 'Background footer', 'assets/images/footer-bg.jpg')) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">Background footer</label><input type="file" name="landing_footer_background" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div></div></div>
 
     </form>
+</div>
+<div class="content-card mb-4">
+    <div class="section-title"><span class="section-number">08A</span><div><h5>Foto galeri</h5><p>Tambah foto tanpa batas dan tentukan kategori untuk setiap foto.</p></div></div>
+    <form method="POST" action="{{ route('admin.landing-settings.gallery.store') }}" enctype="multipart/form-data" class="border rounded p-3 mb-4 bg-light">
+        @csrf
+        <div class="row g-3 align-items-end">
+            <div class="col-md-6"><label class="form-label">Foto baru</label><input type="file" name="photo" class="form-control" accept="image/jpeg,image/png,image/webp" required></div>
+            <div class="col-md-4"><label class="form-label">Kategori</label><input type="text" name="category" class="form-control" placeholder="Contoh: Pre Wedding" maxlength="80" required></div>
+            <div class="col-md-2"><button class="btn btn-primary w-100" type="submit"><i class="fas fa-plus me-1"></i>Tambah</button></div>
+        </div>
+    </form>
+    @if ($galleryItems->isEmpty())
+        <div class="alert alert-info mb-0">Belum ada foto tambahan. Galeri landing masih menggunakan foto bawaan.</div>
+    @else
+        <div class="row g-4">
+            @foreach ($galleryItems as $galleryItem)
+                <div class="col-12 col-md-6 col-xl-4">
+                    <div class="border rounded p-2 h-100">
+                        <img src="{{ asset('storage/'.$galleryItem->image_path) }}" class="w-100 rounded mb-3" style="height:180px;object-fit:cover" alt="Foto galeri">
+                        <form method="POST" action="{{ route('admin.landing-settings.gallery.update', $galleryItem) }}" enctype="multipart/form-data">
+                            @csrf
+                            @method('PUT')
+                            <label class="form-label small">Kategori</label>
+                            <input type="text" name="category" class="form-control form-control-sm mb-2" value="{{ $galleryItem->category }}" maxlength="80" required>
+                            <label class="form-label small">Ganti foto <span class="text-muted">(opsional)</span></label>
+                            <input type="file" name="photo" class="form-control form-control-sm mb-3" accept="image/jpeg,image/png,image/webp">
+                            <button class="btn btn-sm btn-outline-primary w-100" type="submit">Simpan</button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.landing-settings.gallery.destroy', $galleryItem) }}" onsubmit="return confirm('Hapus foto galeri ini?')" class="mt-2">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-outline-danger w-100" type="submit"><i class="fas fa-trash me-1"></i>Hapus foto</button>
+                        </form>
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
 </div>
 <script>
     (() => {
