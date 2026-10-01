@@ -154,6 +154,9 @@ class LandingController extends Controller
             'landing_gift_account_holder' => 'Millar & Aliza',
             'landing_rsvp_title' => 'Be Our RSVP',
             'landing_footer_title' => 'Millar & Aliza Forever',
+            'landing_footer_description' => 'Thank you for being part of our special day.',
+            'landing_footer_description_font_size' => '16',
+            'landing_footer_description_font_family' => 'Georgia, serif',
             'landing_music_file' => '',
         ];
         $sectionDefaults = [

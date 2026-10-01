@@ -107,6 +107,9 @@ class LandingSettingsController extends Controller
             'landing_gift_account_holder' => ['required', 'string', 'max:120'],
             'landing_rsvp_title' => ['required', 'string', 'max:120'],
             'landing_footer_title' => ['required', 'string', 'max:120'],
+            'landing_footer_description' => ['required', 'string', 'max:1000'],
+            'landing_footer_description_font_size' => ['required', 'integer', 'between:12,48'],
+            'landing_footer_description_font_family' => ['required', Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace'])],
             'landing_section_hero' => ['required', 'boolean'],
             'landing_section_couple' => ['required', 'boolean'],
             'landing_section_countdown' => ['required', 'boolean'],
@@ -191,6 +194,9 @@ class LandingSettingsController extends Controller
             ],
             'footer' => [
                 'landing_footer_title' => ['type' => 'string', 'max' => 120],
+                'landing_footer_description' => ['type' => 'string', 'max' => 1000],
+                'landing_footer_description_font_size' => ['type' => 'integer', 'max' => 48],
+                'landing_footer_description_font_family' => ['type' => 'string', 'max' => 40],
             ],
             'cta_gallery' => [
                 'landing_cta_gallery_title' => ['type' => 'string', 'max' => 120],
@@ -388,7 +394,7 @@ class LandingSettingsController extends Controller
             'gta' => ['landing_section_gta'],
             'gift' => ['landing_section_gift', 'landing_gift_title', 'landing_gift_description', 'landing_gift_bank_name', 'landing_gift_account_number', 'landing_gift_account_holder'],
             'music' => ['landing_section_music', 'landing_music_file'],
-            'footer' => ['landing_section_footer', 'landing_footer_title', 'landing_footer_background'],
+            'footer' => ['landing_section_footer', 'landing_footer_title', 'landing_footer_description', 'landing_footer_description_font_size', 'landing_footer_description_font_family', 'landing_footer_background'],
             'order' => ['landing_section_order'],
         ];
 

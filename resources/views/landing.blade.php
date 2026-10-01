@@ -1680,7 +1680,7 @@
                 <div class="row">
                     <div class="text">
                         <h2>{{ $landing['landing_footer_title'] }}</h2>
-                        <p>Thank you</p>
+                        <p style="font-size: {{ (int) $landing['landing_footer_description_font_size'] }}px; font-family: {{ $landing['landing_footer_description_font_family'] }}; white-space: pre-line;">{{ $landing['landing_footer_description'] }}</p>
                     </div>
 
                     <div class="back-to-top">

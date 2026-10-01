@@ -204,6 +204,28 @@ class LandingSectionOrderTest extends TestCase
         $this->assertStringNotContainsString('Selamat menempuh hidup baru.', $content);
     }
 
+    public function test_admin_can_configure_footer_description_typography(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'footer',
+                'landing_section_footer' => '1',
+                'landing_footer_title' => 'Angga & Rika',
+                'landing_footer_description' => 'Terima kasih telah hadir di hari bahagia kami.',
+                'landing_footer_description_font_size' => '18',
+                'landing_footer_description_font_family' => 'Georgia, serif',
+            ])
+            ->assertRedirect();
+
+        $content = $this->get(route('landing'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Terima kasih telah hadir di hari bahagia kami.', $content);
+        $this->assertStringContainsString('font-size: 18px; font-family: Georgia, serif;', $content);
+    }
+
     public function test_admin_can_configure_the_schedule_card_count(): void
     {
         $adminRole = Role::where('slug', 'admin')->firstOrFail();
