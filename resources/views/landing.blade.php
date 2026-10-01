@@ -376,6 +376,10 @@
         @endif
         @if ($landing['landing_section_story'])
         <style>
+            .story-section .story-text p {
+                font-family: Georgia, serif;
+            }
+
             .story-section .story-timeline > .row {
                 display: flex;
                 align-items: stretch;
