@@ -63,6 +63,8 @@ class LandingController extends Controller
             'landing_cta_title_font_size' => '42',
             'landing_cta_title_font_family' => 'inherit',
             'landing_cta_text' => 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or less normal distribution of letters',
+            'landing_cta_text_font_size' => '16',
+            'landing_cta_text_font_family' => 'inherit',
             'landing_cta_rsvp_label' => 'RSVP',
             'landing_cta_rsvp_url' => '#rsvp',
             'landing_cta_location_label' => 'Location',

@@ -63,6 +63,8 @@ class LandingSettingsController extends Controller
             'landing_cta_title_font_size' => ['required', 'integer', 'between:16,96'],
             'landing_cta_title_font_family' => ['required', Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace'])],
             'landing_cta_text' => ['required', 'string', 'max:1000'],
+            'landing_cta_text_font_size' => ['required', 'integer', 'between:12,48'],
+            'landing_cta_text_font_family' => ['required', Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace'])],
             'landing_cta_rsvp_label' => ['required', 'string', 'max:80'],
             'landing_cta_rsvp_url' => ['required', 'string', 'max:2048'],
             'landing_cta_location_label' => ['required', 'string', 'max:80'],
@@ -277,7 +279,7 @@ class LandingSettingsController extends Controller
                 ...array_map(fn (string $network): string => 'landing_groom_'.$network.'_username', ['facebook', 'twitter', 'instagram', 'linkedin']),
             ],
             'countdown' => ['landing_section_countdown', 'landing_countdown_date', 'landing_countdown_background'],
-            'cta' => ['landing_section_cta', 'landing_cta_title', 'landing_cta_title_font_size', 'landing_cta_title_font_family', 'landing_cta_text', 'landing_cta_rsvp_label', 'landing_cta_rsvp_url', 'landing_cta_location_label', 'landing_cta_location_url', 'landing_cta_rsvp_enabled', 'landing_cta_location_enabled', 'landing_cta_background'],
+            'cta' => ['landing_section_cta', 'landing_cta_title', 'landing_cta_title_font_size', 'landing_cta_title_font_family', 'landing_cta_text', 'landing_cta_text_font_size', 'landing_cta_text_font_family', 'landing_cta_rsvp_label', 'landing_cta_rsvp_url', 'landing_cta_location_label', 'landing_cta_location_url', 'landing_cta_rsvp_enabled', 'landing_cta_location_enabled', 'landing_cta_background'],
             'rsvp' => ['landing_section_rsvp', 'landing_rsvp_title', 'landing_rsvp_background'],
             'story' => ['landing_section_story', 'landing_story_title', ...array_merge(
                 ...array_map(fn (int $number): array => [
