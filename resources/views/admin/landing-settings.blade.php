@@ -265,6 +265,8 @@
                         <div class="col-md-6"><label class="form-label">Tanggal</label><input data-schedule-field name="landing_schedule_{{ $number }}_date" class="form-control" value="{{ old('landing_schedule_'.$number.'_date', $settings['landing_schedule_'.$number.'_date'] ?? '') }}" required></div>
                         <div class="col-md-6"><label class="form-label">Waktu</label><input data-schedule-field name="landing_schedule_{{ $number }}_time" class="form-control" value="{{ old('landing_schedule_'.$number.'_time', $settings['landing_schedule_'.$number.'_time'] ?? '') }}" required></div>
                         <div class="col-md-6"><label class="form-label">Lokasi</label><input data-schedule-field name="landing_schedule_{{ $number }}_location" class="form-control" value="{{ old('landing_schedule_'.$number.'_location', $settings['landing_schedule_'.$number.'_location'] ?? '') }}" required></div>
+                        <div class="col-12"><div class="form-check form-switch"><input type="hidden" name="landing_schedule_{{ $number }}_location_enabled" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_schedule_{{ $number }}_location_enabled" name="landing_schedule_{{ $number }}_location_enabled" value="1" @checked(filter_var(old('landing_schedule_'.$number.'_location_enabled', $settings['landing_schedule_'.$number.'_location_enabled'] ?? '1'), FILTER_VALIDATE_BOOLEAN))><label class="form-check-label" for="landing_schedule_{{ $number }}_location_enabled">Tampilkan tombol lokasi</label></div></div>
+                        <div class="col-12"><label class="form-label">Link Google Maps</label><input data-schedule-location-field type="url" name="landing_schedule_{{ $number }}_location_url" class="form-control" value="{{ old('landing_schedule_'.$number.'_location_url', $settings['landing_schedule_'.$number.'_location_url'] ?? '') }}"></div>
                     </div>
                 </div>
             @endforeach
@@ -698,16 +700,27 @@
         const scheduleSectionToggle = form.querySelector('[name="landing_section_schedule"]');
         const scheduleCountField = form.querySelector('[name="landing_schedule_count"]');
         const scheduleFields = [...form.querySelectorAll('[data-schedule-field]')];
+        const scheduleLocationFields = [...form.querySelectorAll('[data-schedule-location-field]')];
         const syncScheduleRequiredState = () => {
             const count = Number(scheduleCountField?.value || 0);
             scheduleFields.forEach((field) => {
                 const number = Number(field.name.match(/landing_schedule_(\d+)_/)?.[1] || 0);
                 field.required = Boolean(scheduleSectionToggle?.checked) && number <= count;
             });
+            scheduleLocationFields.forEach((field) => {
+                const number = Number(field.name.match(/landing_schedule_(\d+)_/)?.[1] || 0);
+                const locationToggle = form.querySelector(`[name="landing_schedule_${number}_location_enabled"]`);
+                field.required = Boolean(scheduleSectionToggle?.checked)
+                    && number <= count
+                    && Boolean(locationToggle?.checked);
+            });
         };
 
         scheduleCountField?.addEventListener('change', syncScheduleRequiredState);
         form.querySelector('[name="landing_section_schedule"]')?.addEventListener('change', syncScheduleRequiredState);
+        form.querySelectorAll('[id^="landing_schedule_"][id$="_location_enabled"]').forEach((toggle) => {
+            toggle.addEventListener('change', syncScheduleRequiredState);
+        });
         syncScheduleRequiredState();
     })();
 </script>

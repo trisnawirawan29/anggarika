@@ -225,12 +225,26 @@ class LandingSettingsController extends Controller
         for ($number = 1; $number <= 6; $number++) {
             $scheduleIsEnabled = $request->boolean('landing_section_schedule')
                 && $number <= $request->integer('landing_schedule_count');
+            $locationButtonIsEnabled = $scheduleIsEnabled
+                && $request->boolean('landing_schedule_'.$number.'_location_enabled');
 
-            foreach (['name' => 120, 'date' => 120, 'time' => 80, 'location' => 255] as $field => $maxLength) {
+            $rules['landing_schedule_'.$number.'_location_enabled'] = ['required', 'boolean'];
+
+            foreach ([
+                'name' => 120,
+                'date' => 120,
+                'time' => 80,
+                'location' => 255,
+                'location_url' => 2048,
+            ] as $field => $maxLength) {
+                $fieldIsRequired = $field === 'location_url'
+                    ? $locationButtonIsEnabled
+                    : $scheduleIsEnabled;
+
                 $rules['landing_schedule_'.$number.'_'.$field] = [
-                    $scheduleIsEnabled ? 'required' : 'nullable',
+                    $fieldIsRequired ? 'required' : 'nullable',
                     'nullable',
-                    'string',
+                    $field === 'location_url' ? 'url' : 'string',
                     'max:'.$maxLength,
                 ];
             }
@@ -329,6 +343,8 @@ class LandingSettingsController extends Controller
                     'landing_schedule_'.$number.'_date',
                     'landing_schedule_'.$number.'_time',
                     'landing_schedule_'.$number.'_location',
+                    'landing_schedule_'.$number.'_location_enabled',
+                    'landing_schedule_'.$number.'_location_url',
                 ], range(1, 6)),
             )],
             'people' => ['landing_section_people', 'landing_people_title'],

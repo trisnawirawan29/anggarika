@@ -794,6 +794,39 @@
                 color: #85aaba;
             }
 
+            .schedule-section .schedule-location-button {
+                display: inline-flex;
+                align-items: center;
+                gap: 8px;
+                margin-top: 14px;
+                padding: 10px 18px;
+                border-radius: 999px;
+                background: linear-gradient(135deg, #85aaba, #557f91);
+                color: #fff;
+                box-shadow: 0 8px 16px rgba(56, 92, 105, .2);
+                font-size: 13px;
+                font-weight: 600;
+                text-decoration: none;
+                transition: transform .25s ease, box-shadow .25s ease;
+            }
+
+            .schedule-section .schedule-location-button:hover {
+                color: #fff;
+                transform: translateY(-3px);
+                box-shadow: 0 12px 22px rgba(56, 92, 105, .3);
+            }
+
+            .schedule-section .schedule-location-button i {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: auto;
+                height: auto;
+                margin: 0;
+                color: #fff;
+                font-size: 14px;
+            }
+
             @media (max-width: 575px) {
                 .schedule-section .schedule-grid {
                     gap: 16px;
@@ -819,6 +852,9 @@
                             <p><i class="fa fa-calendar" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_date'] }}</p>
                             <p><i class="fa fa-clock-o" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_time'] }}</p>
                             <p><i class="fa fa-map-marker" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_location'] }}</p>
+                            @if ($landing['landing_schedule_'.$number.'_location_enabled'])
+                                <a class="schedule-location-button popup-gmaps" href="{{ $landing['landing_schedule_'.$number.'_location_url'] }}"><i class="fa fa-map-marker" aria-hidden="true"></i>Lihat lokasi</a>
+                            @endif
                         </article>
                     @endfor
                 </div>
