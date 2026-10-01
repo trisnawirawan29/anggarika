@@ -353,7 +353,79 @@
         @endif
         @if ($landing['landing_section_countdown'])
         <!-- start count-down-section -->
-        <div class="count-down-area count-down-area-sub" data-landing-section="countdown" style="background-image: url('{{ $landing['landing_countdown_background'] }}');">
+        <style>
+            .countdown-modern .count-down-section {
+                padding: clamp(58px, 8vw, 96px) 0;
+            }
+
+            .countdown-modern .count-down-section .big {
+                margin-bottom: clamp(28px, 5vw, 52px);
+            }
+
+            .countdown-modern .count-down-section h2 {
+                font-size: clamp(38px, 5vw, 60px);
+            }
+
+            .countdown-modern .count-down-section h2 > span {
+                font-size: clamp(20px, 2.5vw, 30px);
+                margin-bottom: 8px;
+            }
+
+            .countdown-modern .count-down-section #clock {
+                display: grid;
+                grid-template-columns: repeat(4, minmax(0, 1fr));
+                gap: clamp(8px, 2vw, 18px);
+                max-width: 760px;
+                margin: 0 auto;
+                overflow: visible;
+            }
+
+            .countdown-modern .count-down-section #clock > div {
+                width: auto;
+                float: none;
+                margin: 0 !important;
+                padding: clamp(14px, 2.5vw, 28px) 8px;
+                border: 1px solid rgba(255, 255, 255, .35);
+                border-radius: 18px;
+                background: linear-gradient(145deg, rgba(133, 170, 186, .82), rgba(72, 111, 126, .7));
+                box-shadow: 0 12px 24px rgba(0, 0, 0, .18);
+                backdrop-filter: blur(4px);
+            }
+
+            .countdown-modern .count-down-section #clock .box > div {
+                font-size: clamp(30px, 5vw, 58px);
+                line-height: 1;
+            }
+
+            .countdown-modern .count-down-section #clock .box span {
+                display: block;
+                margin-top: 8px;
+                font-size: clamp(9px, 1.4vw, 14px);
+                letter-spacing: .08em;
+            }
+
+            @media (max-width: 575px) {
+                .countdown-modern .count-down-section #clock {
+                    gap: 6px;
+                }
+
+                .countdown-modern .count-down-section #clock > div {
+                    padding: 12px 3px;
+                    border-radius: 12px;
+                }
+
+                .countdown-modern .count-down-section #clock .box > div {
+                    font-size: clamp(24px, 8vw, 34px);
+                }
+
+                .countdown-modern .count-down-section #clock .box span {
+                    margin-top: 5px;
+                    font-size: 8px;
+                    letter-spacing: .04em;
+                }
+            }
+        </style>
+        <div class="count-down-area count-down-area-sub countdown-modern" data-landing-section="countdown" style="background-image: url('{{ $landing['landing_countdown_background'] }}');">
             <section class="count-down-section section-padding parallax" data-speed="7">
                 <div class="container">
                     <div class="col-12 text-center">
