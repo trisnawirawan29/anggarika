@@ -216,7 +216,7 @@
             <input type="hidden" name="landing_section_order" value="{{ json_encode($sectionOrder) }}">
             <ol class="landing-section-order-list" aria-label="Urutan section landing page">
                 @php
-                    $sectionLabels = ['hero' => 'Hero', 'couple' => 'Pasangan', 'countdown' => 'Countdown', 'story' => 'Cerita', 'cta' => 'CTA', 'event' => 'Acara', 'people' => 'Keluarga & teman', 'cta_gallery' => 'CTA sebelum galeri', 'gallery' => 'Galeri', 'rsvp' => 'RSVP', 'gta' => 'Informasi perjalanan', 'gift' => 'Gift registration', 'footer' => 'Footer', 'music' => 'Music player'];
+                    $sectionLabels = ['hero' => 'Hero', 'couple' => 'Pasangan', 'countdown' => 'Countdown', 'story' => 'Cerita', 'cta' => 'CTA', 'event' => 'Acara', 'schedule' => 'Jadwal acara', 'people' => 'Keluarga & teman', 'cta_gallery' => 'CTA sebelum galeri', 'gallery' => 'Galeri', 'rsvp' => 'RSVP', 'gta' => 'Informasi perjalanan', 'gift' => 'Gift registration', 'footer' => 'Footer', 'music' => 'Music player'];
                 @endphp
                 @foreach ($sectionOrder as $sectionKey)
                     <li class="landing-section-order-item" draggable="true" data-section="{{ $sectionKey }}"><i class="fas fa-grip-vertical text-muted"></i><span>{{ $sectionLabels[$sectionKey] }}</span></li>
@@ -248,6 +248,26 @@
                     </div>
                 @endforeach
             </div>
+        </div>
+
+        <div class="content-card mb-4">
+            <div class="section-title"><span class="section-number">06</span><div><h5>Jadwal acara</h5><p>Tambahkan card informasi acara dengan jumlah yang dapat diatur.</p></div></div>
+            <div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_schedule" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_schedule" name="landing_section_schedule" value="1" @checked(old('landing_section_schedule', $settings['landing_section_schedule'] ?? '1'))><label class="form-check-label" for="landing_section_schedule">Tampilkan jadwal acara</label></div>
+            <div class="row g-3 mb-4">
+                <div class="col-md-8"><label class="form-label">Judul section</label><input name="landing_schedule_title" class="form-control" value="{{ old('landing_schedule_title', $settings['landing_schedule_title'] ?? 'Wedding Schedule') }}" required></div>
+                <div class="col-md-4"><label class="form-label">Jumlah card</label><select name="landing_schedule_count" class="form-select" required>@foreach (range(1, 6) as $count)<option value="{{ $count }}" @selected((int) old('landing_schedule_count', $settings['landing_schedule_count'] ?? '3') === $count)>{{ $count }} card</option>@endforeach</select></div>
+            </div>
+            @foreach (range(1, 6) as $number)
+                <div class="border rounded p-3 mb-3">
+                    <h6>Card acara {{ $number }}</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6"><label class="form-label">Nama acara</label><input data-schedule-field name="landing_schedule_{{ $number }}_name" class="form-control" value="{{ old('landing_schedule_'.$number.'_name', $settings['landing_schedule_'.$number.'_name'] ?? 'Acara '.$number) }}" required></div>
+                        <div class="col-md-6"><label class="form-label">Tanggal</label><input data-schedule-field name="landing_schedule_{{ $number }}_date" class="form-control" value="{{ old('landing_schedule_'.$number.'_date', $settings['landing_schedule_'.$number.'_date'] ?? '') }}" required></div>
+                        <div class="col-md-6"><label class="form-label">Waktu</label><input data-schedule-field name="landing_schedule_{{ $number }}_time" class="form-control" value="{{ old('landing_schedule_'.$number.'_time', $settings['landing_schedule_'.$number.'_time'] ?? '') }}" required></div>
+                        <div class="col-md-6"><label class="form-label">Lokasi</label><input data-schedule-field name="landing_schedule_{{ $number }}_location" class="form-control" value="{{ old('landing_schedule_'.$number.'_location', $settings['landing_schedule_'.$number.'_location'] ?? '') }}" required></div>
+                    </div>
+                </div>
+            @endforeach
         </div>
 
         <div class="content-card mb-4">
@@ -544,6 +564,7 @@
                 'RSVP': 'rsvp',
                 'Cerita': 'story',
                 'Acara': 'event',
+                'Jadwal acara': 'schedule',
                 'Keluarga & teman': 'people',
                 'CTA sebelum galeri': 'cta_gallery',
                 'Galeri': 'gallery',
@@ -673,6 +694,21 @@
             eventToggle?.addEventListener('change', syncRequiredState);
             syncRequiredState();
         });
+
+        const scheduleSectionToggle = form.querySelector('[name="landing_section_schedule"]');
+        const scheduleCountField = form.querySelector('[name="landing_schedule_count"]');
+        const scheduleFields = [...form.querySelectorAll('[data-schedule-field]')];
+        const syncScheduleRequiredState = () => {
+            const count = Number(scheduleCountField?.value || 0);
+            scheduleFields.forEach((field) => {
+                const number = Number(field.name.match(/landing_schedule_(\d+)_/)?.[1] || 0);
+                field.required = Boolean(scheduleSectionToggle?.checked) && number <= count;
+            });
+        };
+
+        scheduleCountField?.addEventListener('change', syncScheduleRequiredState);
+        form.querySelector('[name="landing_section_schedule"]')?.addEventListener('change', syncScheduleRequiredState);
+        syncScheduleRequiredState();
     })();
 </script>
 <script>

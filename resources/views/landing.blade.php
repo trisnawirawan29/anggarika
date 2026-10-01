@@ -749,6 +749,82 @@
         </div>
         <!-- event-area end -->
         @endif
+        @if ($landing['landing_section_schedule'])
+        <style>
+            .schedule-section .schedule-grid {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 24px;
+            }
+
+            .schedule-section .schedule-card {
+                flex: 0 1 280px;
+                padding: 28px 24px;
+                text-align: center;
+                background: #fff;
+                border: 1px solid rgba(133, 170, 186, .35);
+                border-top: 5px solid #85aaba;
+                border-radius: 18px;
+                box-shadow: 0 12px 28px rgba(56, 92, 105, .12);
+                transition: transform .25s ease, box-shadow .25s ease;
+            }
+
+            .schedule-section .schedule-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 18px 34px rgba(56, 92, 105, .18);
+            }
+
+            .schedule-section .schedule-card h3 {
+                margin: 0 0 16px;
+                color: #557f91;
+                font-size: 24px;
+            }
+
+            .schedule-section .schedule-card p {
+                margin: 8px 0 0;
+                color: #666;
+                line-height: 1.6;
+            }
+
+            .schedule-section .schedule-card i {
+                width: 34px;
+                height: 34px;
+                margin-right: 6px;
+                color: #85aaba;
+            }
+
+            @media (max-width: 575px) {
+                .schedule-section .schedule-grid {
+                    gap: 16px;
+                }
+
+                .schedule-section .schedule-card {
+                    flex-basis: min(100%, 320px);
+                    padding: 22px 18px;
+                }
+            }
+        </style>
+        <section id="schedule" class="schedule-section section-padding" data-landing-section="schedule">
+            <div class="container">
+                <div class="col-12">
+                    <div class="section-title text-center">
+                        <h2>{{ $landing['landing_schedule_title'] }}</h2>
+                    </div>
+                </div>
+                <div class="schedule-grid">
+                    @for ($number = 1; $number <= (int) $landing['landing_schedule_count']; $number++)
+                        <article class="schedule-card">
+                            <h3>{{ $landing['landing_schedule_'.$number.'_name'] }}</h3>
+                            <p><i class="fa fa-calendar" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_date'] }}</p>
+                            <p><i class="fa fa-clock-o" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_time'] }}</p>
+                            <p><i class="fa fa-map-marker" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_location'] }}</p>
+                        </article>
+                    @endfor
+                </div>
+            </div>
+        </section>
+        @endif
         @if ($landing['landing_section_people'])
         <!-- groomsmen-bridesmaid-area start -->
         <div id="people" class="groomsmen-bridesmaid-area pt--150 pb--70" data-landing-section="people">

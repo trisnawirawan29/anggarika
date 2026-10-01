@@ -16,7 +16,7 @@ class LandingSettingsController extends Controller
 {
     /** @var list<string> */
     private const LANDING_SECTION_ORDER = [
-        'hero', 'couple', 'countdown', 'story', 'cta', 'event', 'people', 'cta_gallery',
+        'hero', 'couple', 'countdown', 'story', 'cta', 'event', 'schedule', 'people', 'cta_gallery',
         'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music',
     ];
 
@@ -76,6 +76,8 @@ class LandingSettingsController extends Controller
             'landing_cta_gallery_location_label' => ['required', 'string', 'max:80'],
             'landing_cta_gallery_location_url' => ['required', 'url', 'max:2048'],
             'landing_event_title' => ['required', 'string', 'max:120'],
+            'landing_schedule_title' => ['required', 'string', 'max:120'],
+            'landing_schedule_count' => ['required', 'integer', 'between:1,6'],
             ...array_fill_keys(array_map(fn (int $number): string => 'landing_event_'.$number.'_enabled', range(1, 4)), ['required', 'boolean']),
             'landing_people_title' => ['required', 'string', 'max:120'],
             'landing_gallery_title' => ['required', 'string', 'max:120'],
@@ -93,6 +95,7 @@ class LandingSettingsController extends Controller
             'landing_cta_rsvp_enabled' => ['required', 'boolean'],
             'landing_cta_location_enabled' => ['required', 'boolean'],
             'landing_section_event' => ['required', 'boolean'],
+            'landing_section_schedule' => ['required', 'boolean'],
             'landing_section_people' => ['required', 'boolean'],
             'landing_section_cta_gallery' => ['required', 'boolean'],
             'landing_cta_gallery_rsvp_enabled' => ['required', 'boolean'],
@@ -138,6 +141,9 @@ class LandingSettingsController extends Controller
             ],
             'event' => [
                 'landing_event_title' => ['type' => 'string', 'max' => 120],
+            ],
+            'schedule' => [
+                'landing_schedule_title' => ['type' => 'string', 'max' => 120],
             ],
             'people' => [
                 'landing_people_title' => ['type' => 'string', 'max' => 120],
@@ -214,6 +220,20 @@ class LandingSettingsController extends Controller
             $rules['landing_story_'.$number.'_title'] = [$storyIsEnabled ? 'required' : 'nullable', 'string', 'max:120'];
             $rules['landing_story_'.$number.'_date'] = [$storyIsEnabled ? 'required' : 'nullable', 'string', 'max:120'];
             $rules['landing_story_'.$number.'_text'] = [$storyIsEnabled ? 'required' : 'nullable', 'string', 'max:1000'];
+        }
+
+        for ($number = 1; $number <= 6; $number++) {
+            $scheduleIsEnabled = $request->boolean('landing_section_schedule')
+                && $number <= $request->integer('landing_schedule_count');
+
+            foreach (['name' => 120, 'date' => 120, 'time' => 80, 'location' => 255] as $field => $maxLength) {
+                $rules['landing_schedule_'.$number.'_'.$field] = [
+                    $scheduleIsEnabled ? 'required' : 'nullable',
+                    'nullable',
+                    'string',
+                    'max:'.$maxLength,
+                ];
+            }
         }
 
         foreach (range(1, 4) as $number) {
@@ -302,6 +322,14 @@ class LandingSettingsController extends Controller
                     'landing_event_'.$number.'_location_url',
                     'landing_event_photo_'.$number,
                 ], range(1, 4)),
+            )],
+            'schedule' => ['landing_section_schedule', 'landing_schedule_title', 'landing_schedule_count', ...array_merge(
+                ...array_map(fn (int $number): array => [
+                    'landing_schedule_'.$number.'_name',
+                    'landing_schedule_'.$number.'_date',
+                    'landing_schedule_'.$number.'_time',
+                    'landing_schedule_'.$number.'_location',
+                ], range(1, 6)),
             )],
             'people' => ['landing_section_people', 'landing_people_title'],
             'cta_gallery' => ['landing_section_cta_gallery', 'landing_cta_gallery_title', 'landing_cta_gallery_text', 'landing_cta_gallery_rsvp_label', 'landing_cta_gallery_rsvp_url', 'landing_cta_gallery_location_label', 'landing_cta_gallery_location_url', 'landing_cta_gallery_rsvp_enabled', 'landing_cta_gallery_location_enabled', 'landing_cta_gallery_background'],

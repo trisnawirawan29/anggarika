@@ -18,7 +18,7 @@ class LandingSectionOrderTest extends TestCase
     {
         $adminRole = Role::where('slug', 'admin')->firstOrFail();
         $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
-        $order = ['hero', 'story', 'couple', 'countdown', 'cta', 'event', 'people', 'cta_gallery', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
+        $order = ['hero', 'story', 'couple', 'countdown', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
 
         $response = $this->actingAs($admin)
             ->put(route('admin.landing-settings.update'), [
@@ -32,7 +32,7 @@ class LandingSectionOrderTest extends TestCase
 
     public function test_landing_page_renders_sections_in_saved_order(): void
     {
-        $order = ['hero', 'story', 'couple', 'countdown', 'cta', 'event', 'people', 'cta_gallery', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
+        $order = ['hero', 'story', 'couple', 'countdown', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
         Setting::updateOrCreate(['key' => 'landing_section_order'], ['value' => json_encode($order)]);
 
         $content = $this->get(route('landing'))->assertOk()->getContent();
@@ -95,5 +95,53 @@ class LandingSectionOrderTest extends TestCase
         $this->assertStringContainsString('Acara 1', $content);
         $this->assertStringNotContainsString('Acara 2', $content);
         $this->assertStringNotContainsString('q=acara1', $content);
+    }
+
+    public function test_admin_can_configure_the_schedule_card_count(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $response = $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'schedule',
+                'landing_section_schedule' => '1',
+                'landing_schedule_title' => 'Rangkaian Acara',
+                'landing_schedule_count' => '2',
+                'landing_schedule_1_name' => 'Akad Nikah',
+                'landing_schedule_1_date' => '25 Desember 2026',
+                'landing_schedule_1_time' => '08.00 WITA',
+                'landing_schedule_1_location' => 'Gedung A',
+                'landing_schedule_2_name' => 'Resepsi',
+                'landing_schedule_2_date' => '25 Desember 2026',
+                'landing_schedule_2_time' => '11.00 WITA',
+                'landing_schedule_2_location' => 'Gedung B',
+                'landing_schedule_3_name' => '',
+                'landing_schedule_3_date' => '',
+                'landing_schedule_3_time' => '',
+                'landing_schedule_3_location' => '',
+                'landing_schedule_4_name' => '',
+                'landing_schedule_4_date' => '',
+                'landing_schedule_4_time' => '',
+                'landing_schedule_4_location' => '',
+                'landing_schedule_5_name' => '',
+                'landing_schedule_5_date' => '',
+                'landing_schedule_5_time' => '',
+                'landing_schedule_5_location' => '',
+                'landing_schedule_6_name' => '',
+                'landing_schedule_6_date' => '',
+                'landing_schedule_6_time' => '',
+                'landing_schedule_6_location' => '',
+            ])
+            ->assertRedirect();
+
+        $this->assertSame('2', (string) Setting::value('landing_schedule_count'));
+        $this->assertSame('Rangkaian Acara', Setting::value('landing_schedule_title'));
+
+        $content = $this->get(route('landing'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Akad Nikah', $content);
+        $this->assertStringContainsString('Resepsi', $content);
+        $this->assertStringNotContainsString('Acara 3', $content);
     }
 }
