@@ -801,9 +801,10 @@
             .schedule-section .schedule-card .schedule-address {
                 display: flex;
                 align-items: flex-start;
+                justify-content: center;
                 gap: 6px;
                 margin-top: 6px;
-                text-align: left;
+                text-align: center;
                 line-height: 1.35;
             }
 
