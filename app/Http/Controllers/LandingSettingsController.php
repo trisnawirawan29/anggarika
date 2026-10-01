@@ -86,6 +86,10 @@ class LandingSettingsController extends Controller
             ...array_fill_keys(array_map(fn (int $number): string => 'landing_event_'.$number.'_enabled', range(1, 4)), ['required', 'boolean']),
             'landing_people_title' => ['required', 'string', 'max:120'],
             'landing_gallery_title' => ['required', 'string', 'max:120'],
+            'landing_gift_description' => ['required', 'string', 'max:1000'],
+            'landing_gift_bank_name' => ['required', 'string', 'max:80'],
+            'landing_gift_account_number' => ['required', 'string', 'max:40'],
+            'landing_gift_account_holder' => ['required', 'string', 'max:120'],
             'landing_rsvp_title' => ['required', 'string', 'max:120'],
             'landing_footer_title' => ['required', 'string', 'max:120'],
             'landing_section_hero' => ['required', 'boolean'],
@@ -152,6 +156,12 @@ class LandingSettingsController extends Controller
             ],
             'people' => [
                 'landing_people_title' => ['type' => 'string', 'max' => 120],
+            ],
+            'gift' => [
+                'landing_gift_description' => ['type' => 'string', 'max' => 1000],
+                'landing_gift_bank_name' => ['type' => 'string', 'max' => 80],
+                'landing_gift_account_number' => ['type' => 'string', 'max' => 40],
+                'landing_gift_account_holder' => ['type' => 'string', 'max' => 120],
             ],
             'gallery' => [
                 'landing_gallery_title' => ['type' => 'string', 'max' => 120],
@@ -356,7 +366,7 @@ class LandingSettingsController extends Controller
             'cta_gallery' => ['landing_section_cta_gallery', 'landing_cta_gallery_title', 'landing_cta_gallery_text', 'landing_cta_gallery_rsvp_label', 'landing_cta_gallery_rsvp_url', 'landing_cta_gallery_location_label', 'landing_cta_gallery_location_url', 'landing_cta_gallery_rsvp_enabled', 'landing_cta_gallery_location_enabled', 'landing_cta_gallery_background'],
             'gallery' => ['landing_section_gallery', 'landing_gallery_title', ...array_map(fn (int $number): string => 'landing_gallery_photo_'.$number, range(1, 6))],
             'gta' => ['landing_section_gta'],
-            'gift' => ['landing_section_gift'],
+            'gift' => ['landing_section_gift', 'landing_gift_description', 'landing_gift_bank_name', 'landing_gift_account_number', 'landing_gift_account_holder'],
             'music' => ['landing_section_music', 'landing_music_file'],
             'footer' => ['landing_section_footer', 'landing_footer_title', 'landing_footer_background'],
             'order' => ['landing_section_order'],

@@ -120,6 +120,32 @@ class LandingSectionOrderTest extends TestCase
         $this->assertStringNotContainsString('q=acara1', $content);
     }
 
+    public function test_admin_can_configure_gift_registration_account_details(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'gift',
+                'landing_section_gift' => '1',
+                'landing_gift_description' => 'Terima kasih atas perhatian dan doa Anda.',
+                'landing_gift_bank_name' => 'Bank Mandiri',
+                'landing_gift_account_number' => '9876543210',
+                'landing_gift_account_holder' => 'Angga & Rika',
+            ])
+            ->assertRedirect();
+
+        $this->assertSame('Bank Mandiri', Setting::value('landing_gift_bank_name'));
+        $this->assertSame('9876543210', Setting::value('landing_gift_account_number'));
+
+        $content = $this->get(route('landing'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Terima kasih atas perhatian dan doa Anda.', $content);
+        $this->assertStringContainsString('9876543210', $content);
+        $this->assertStringContainsString('Angga &amp; Rika', $content);
+    }
+
     public function test_admin_can_configure_the_schedule_card_count(): void
     {
         $adminRole = Role::where('slug', 'admin')->firstOrFail();

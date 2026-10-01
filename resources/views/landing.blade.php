@@ -297,7 +297,7 @@
                 <div class="col-l2">
                     <div class="section-title text-center">
                         <h2>{{ $landing['landing_couple_title'] }}</h2>
-                    </div>
+                    </article>
                 </div>
                 <div class="couple-wrap">
                     <div class="row">
@@ -1320,21 +1320,180 @@
         @endif
         @if ($landing['landing_section_gift'])
         <!-- Gift Registration start -->
-        <div class="Gift-area pt--100 pb--30" data-landing-section="gift">
+        <style>
+            .gift-registration-modern {
+                padding: clamp(72px, 9vw, 120px) 0 clamp(48px, 7vw, 88px);
+                background: linear-gradient(180deg, #fff 0%, #f7fbfc 100%);
+            }
+
+            .gift-registration-modern .section-title {
+                margin-bottom: 70px;
+            }
+
+            .gift-registration-modern .gift-description {
+                max-width: 680px;
+                margin: 0 auto clamp(28px, 5vw, 48px);
+                color: #666;
+                font-family: Georgia, serif;
+                font-size: 16px;
+                line-height: 1.8;
+                text-align: center;
+            }
+
+            .gift-registration-modern .gift-card-wrap {
+                display: flex;
+                justify-content: center;
+            }
+
+            .gift-registration-modern .gift-card {
+                position: relative;
+                width: min(100%, 460px);
+                min-height: 270px;
+                padding: 28px 32px;
+                overflow: hidden;
+                border: 1px solid rgba(255, 255, 255, .45);
+                border-radius: 24px;
+                background: linear-gradient(135deg, #557f91 0%, #85aaba 52%, #c0d8df 100%);
+                box-shadow: 0 22px 42px rgba(56, 92, 105, .24);
+                color: #fff;
+                isolation: isolate;
+            }
+
+            .gift-registration-modern .gift-card::before,
+            .gift-registration-modern .gift-card::after {
+                position: absolute;
+                z-index: -1;
+                width: 190px;
+                height: 190px;
+                border: 1px solid rgba(255, 255, 255, .2);
+                border-radius: 50%;
+                content: '';
+            }
+
+            .gift-registration-modern .gift-card::before {
+                top: -108px;
+                right: -42px;
+            }
+
+            .gift-registration-modern .gift-card::after {
+                right: -84px;
+                bottom: -122px;
+            }
+
+            .gift-registration-modern .gift-card-top,
+            .gift-registration-modern .gift-card-bottom {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .gift-registration-modern .gift-bank-name {
+                font-size: 21px;
+                font-weight: 700;
+                letter-spacing: .04em;
+            }
+
+            .gift-registration-modern .gift-card-type {
+                font-size: 11px;
+                font-weight: 700;
+                letter-spacing: .18em;
+                text-transform: uppercase;
+            }
+
+            .gift-registration-modern .gift-chip {
+                width: 48px;
+                height: 36px;
+                margin: 30px 0 20px;
+                border: 1px solid rgba(70, 80, 80, .35);
+                border-radius: 8px;
+                background: linear-gradient(135deg, #f4df9d, #c59c51);
+                box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .28);
+            }
+
+            .gift-registration-modern .gift-account-number {
+                margin: 0 0 24px;
+                font-size: clamp(23px, 5vw, 31px);
+                font-weight: 600;
+                letter-spacing: .12em;
+                line-height: 1.2;
+                word-break: break-word;
+            }
+
+            .gift-registration-modern .gift-card-bottom {
+                align-items: flex-end;
+                gap: 16px;
+            }
+
+            .gift-registration-modern .gift-card-label {
+                display: block;
+                margin-bottom: 4px;
+                font-size: 9px;
+                letter-spacing: .14em;
+                opacity: .78;
+                text-transform: uppercase;
+            }
+
+            .gift-registration-modern .gift-account-holder {
+                font-size: 14px;
+                font-weight: 600;
+                letter-spacing: .05em;
+                text-transform: uppercase;
+            }
+
+            .gift-registration-modern .gift-contactless {
+                font-size: 27px;
+                line-height: 1;
+                opacity: .85;
+                transform: rotate(90deg);
+            }
+
+            @media (max-width: 575px) {
+                .gift-registration-modern .section-title {
+                    margin-bottom: 60px;
+                }
+
+                .gift-registration-modern .gift-card {
+                    min-height: 230px;
+                    padding: 22px 21px;
+                    border-radius: 19px;
+                }
+
+                .gift-registration-modern .gift-chip {
+                    width: 41px;
+                    height: 31px;
+                    margin: 22px 0 16px;
+                }
+
+                .gift-registration-modern .gift-account-number {
+                    margin-bottom: 20px;
+                    letter-spacing: .08em;
+                }
+            }
+        </style>
+        <div class="Gift-area gift-registration-modern" data-landing-section="gift">
             <div class="container">
                 <div class="col-12">
                     <div class="section-title text-center">
                         <h2>Gift Registration</h2>
                     </div>
-                    <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered alteration in some form, by injected humour, or randomised.</p>
+                    <p class="gift-description">{{ $landing['landing_gift_description'] }}</p>
                 </div>
-                <div class="gift-item">
-                    <div class="Gift-carousel owl-carousel">
-                        <img src="{{ asset('assets/images/gift/img-1.jpg') }}" alt="clinet">
-                        <img src="{{ asset('assets/images/gift/img-2.jpg') }}" alt="clinet">
-                        <img src="{{ asset('assets/images/gift/img-3.jpg') }}" alt="clinet">
-                        <img src="{{ asset('assets/images/gift/img-4.jpg') }}" alt="clinet">
-                    </div>
+                <div class="gift-card-wrap">
+                    <article class="gift-card" aria-label="Informasi rekening hadiah">
+                        <div class="gift-card-top">
+                            <span class="gift-bank-name">{{ $landing['landing_gift_bank_name'] }}</span>
+                            <span class="gift-card-type">Wedding Gift</span>
+                        </div>
+                        <div class="gift-chip" aria-hidden="true"></div>
+                        <p class="gift-account-number">{{ $landing['landing_gift_account_number'] }}</p>
+                        <div class="gift-card-bottom">
+                            <div>
+                                <span class="gift-card-label">Atas nama</span>
+                                <span class="gift-account-holder">{{ $landing['landing_gift_account_holder'] }}</span>
+                            </div>
+                            <span class="gift-contactless" aria-hidden="true">)))</span>
+                        </div>
+                    </article>
                 </div>
             </div>
         </div>
