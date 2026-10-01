@@ -783,12 +783,14 @@
                 margin: 0 0 16px;
                 color: #557f91;
                 font-size: 24px;
+                font-family: 'Great Vibes', cursive;
             }
 
             .schedule-section .schedule-card p {
                 margin: 8px 0 0;
                 color: #666;
                 line-height: 1.6;
+                font-family: Georgia, serif;
             }
 
             .schedule-section .schedule-card i {
