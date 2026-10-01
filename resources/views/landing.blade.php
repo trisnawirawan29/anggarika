@@ -484,7 +484,7 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="cta-content">
-                            <h2>{{ $landing['landing_cta_title'] }}</h2>
+                            <h2 style="font-size: {{ (int) $landing['landing_cta_title_font_size'] }}px;{{ $landing['landing_cta_title_font_family'] !== 'inherit' ? ' font-family: '.$landing['landing_cta_title_font_family'].';' : '' }}">{{ $landing['landing_cta_title'] }}</h2>
                             <p style="white-space: pre-line;">{{ $landing['landing_cta_text'] }}</p>
                             @if ($landing['landing_cta_rsvp_enabled'])
                             <div class="btn btn-3"><a href="{{ $landing['landing_cta_rsvp_url'] }}" class="go-rsvp-area">{{ $landing['landing_cta_rsvp_label'] }}</a></div>

@@ -60,6 +60,8 @@ class LandingController extends Controller
             'landing_story_4_date' => 'Jul 14 2019',
             'landing_story_4_text' => 'A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine. I am so happy, my dear friend,',
             'landing_cta_title' => 'Welcome to our big day',
+            'landing_cta_title_font_size' => '42',
+            'landing_cta_title_font_family' => 'inherit',
             'landing_cta_text' => 'It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or less normal distribution of letters',
             'landing_cta_rsvp_label' => 'RSVP',
             'landing_cta_rsvp_url' => '#rsvp',
