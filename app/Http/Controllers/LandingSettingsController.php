@@ -360,6 +360,7 @@ class LandingSettingsController extends Controller
         }
 
         $sectionFields = [
+            'guest_message' => ['landing_guest_message_template'],
             'hero' => ['landing_section_hero', 'landing_page_title', 'landing_hero_subtitle', 'landing_hero_title', 'landing_hero_date', 'landing_guest_greeting', 'landing_guest_apology', 'landing_guest_message_template', 'landing_hero_background'],
             'couple' => [
                 'landing_section_couple', 'landing_couple_title', 'landing_bride_name', 'landing_bride_bio', 'landing_groom_name', 'landing_groom_bio',

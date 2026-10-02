@@ -7,7 +7,7 @@
     <div class="card-heading"><div><h5>Format pesan WhatsApp</h5><p>Atur pesan yang digunakan untuk setiap tamu undangan.</p></div></div>
     <form method="POST" action="{{ route('admin.landing-settings.update') }}" class="row g-3">
         @csrf @method('PUT')
-        <input type="hidden" name="save_section" value="hero">
+        <input type="hidden" name="save_section" value="guest_message">
         <div class="col-12"><label class="form-label">Format pesan WhatsApp</label><textarea name="landing_guest_message_template" class="form-control" rows="4" required>{{ old('landing_guest_message_template', $guestSettings['landing_guest_message_template']) }}</textarea><div class="form-text">Gunakan <code>@{{nama}}</code> untuk nama tamu dan <code>@{{link}}</code> untuk link unik. Link akan dikirim sebagai URL yang dapat diklik di WhatsApp.</div></div>
         <div class="col-12 d-flex justify-content-end"><button class="btn btn-primary"><i class="fas fa-save me-1"></i>Simpan pengaturan</button></div>
     </form>

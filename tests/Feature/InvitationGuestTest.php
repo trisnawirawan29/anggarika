@@ -73,7 +73,8 @@ class InvitationGuestTest extends TestCase
             ->get(route('admin.invitation-guests.index'))
             ->assertOk()
             ->assertSee('Rina Wijaya')
-            ->assertSee('Salin pesan WhatsApp', false);
+            ->assertSee('Salin pesan WhatsApp', false)
+            ->assertSee('name="save_section" value="guest_message"', false);
     }
 
     public function test_admin_can_update_whatsapp_message_template_from_guest_menu(): void
@@ -82,8 +83,7 @@ class InvitationGuestTest extends TestCase
         $admin = User::factory()->create(['role' => 'admin', 'role_id' => $role->id]);
 
         $response = $this->actingAs($admin)->put(route('admin.landing-settings.update'), [
-            'save_section' => 'hero',
-            'landing_section_hero' => '0',
+            'save_section' => 'guest_message',
             'landing_guest_message_template' => 'Halo {{nama}}, buka {{link}}.',
         ]);
 
