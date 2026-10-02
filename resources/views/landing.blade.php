@@ -627,6 +627,11 @@
             }
 
             @media (max-width: 767px) {
+                .cta-area {
+                    background-attachment: scroll;
+                    background-position: center center;
+                }
+
                 .cta-area .cta-title {
                     font-size: clamp(24px, 8vw, calc(var(--cta-title-size) * .72)) !important;
                     line-height: 1.15;
