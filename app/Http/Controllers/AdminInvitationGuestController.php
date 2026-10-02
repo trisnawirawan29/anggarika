@@ -15,26 +15,25 @@ class AdminInvitationGuestController extends Controller
     {
         $messageTemplate = (string) Setting::query()->where('key', 'landing_guest_message_template')->value('value');
         $messageTemplate = $messageTemplate !== '' ? $messageTemplate : "Halo {{nama}},\n\nKami mengundang Anda untuk hadir di acara pernikahan kami.\n\nBuka undangan: {{link}}";
-        $guestSettings = Setting::query()
-            ->whereIn('key', ['landing_guest_greeting', 'landing_guest_apology', 'landing_guest_message_template'])
-            ->pluck('value', 'key')
-            ->all();
-        $guestSettings = array_replace([
-            'landing_guest_greeting' => 'Kepada Yth.',
-            'landing_guest_apology' => 'Mohon maaf apabila ada kesalahan penulisan nama/alamat.',
-            'landing_guest_message_template' => $messageTemplate,
-        ], $guestSettings);
+        $guestSettings = ['landing_guest_message_template' => $messageTemplate];
         $guests = InvitationGuest::query()
             ->when(request('search'), fn ($query, $search) => $query->where('name', 'like', "%{$search}%"))
             ->latest()
             ->get()
             ->map(function (InvitationGuest $guest) use ($messageTemplate): InvitationGuest {
-                $guest->setAttribute('invitation_url', route('invitation', $guest));
-                $guest->setAttribute('invitation_message', str_replace(
+                $invitationUrl = route('invitation', $guest);
+                $invitationMessage = str_replace(
                     ['{{nama}}', '{{link}}'],
-                    [$guest->name, route('invitation', $guest)],
+                    [$guest->name, $invitationUrl],
                     $messageTemplate,
-                ));
+                );
+
+                if (! str_contains($messageTemplate, '{{link}}')) {
+                    $invitationMessage .= "\n\n".$invitationUrl;
+                }
+
+                $guest->setAttribute('invitation_url', $invitationUrl);
+                $guest->setAttribute('invitation_message', $invitationMessage);
 
                 return $guest;
             });

@@ -4,14 +4,11 @@
 @section('page-subtitle', 'Kelola nama tamu, link undangan unik, dan pesan WhatsApp.')
 @section('content')
 <div class="content-card mb-4">
-    <div class="card-heading"><div><h5>Pengaturan undangan personal</h5><p>Atur teks yang tampil pada Hero dan format pesan WhatsApp.</p></div></div>
+    <div class="card-heading"><div><h5>Format pesan WhatsApp</h5><p>Atur pesan yang digunakan untuk setiap tamu undangan.</p></div></div>
     <form method="POST" action="{{ route('admin.landing-settings.update') }}" class="row g-3">
         @csrf @method('PUT')
         <input type="hidden" name="save_section" value="hero">
-        <input type="hidden" name="landing_section_hero" value="0">
-        <div class="col-md-6"><label class="form-label">Tulisan sapaan</label><input name="landing_guest_greeting" class="form-control" value="{{ old('landing_guest_greeting', $guestSettings['landing_guest_greeting']) }}" required></div>
-        <div class="col-md-6"><label class="form-label">Tulisan permintaan maaf</label><input name="landing_guest_apology" class="form-control" value="{{ old('landing_guest_apology', $guestSettings['landing_guest_apology']) }}" required></div>
-        <div class="col-12"><label class="form-label">Format pesan WhatsApp</label><textarea name="landing_guest_message_template" class="form-control" rows="4" required>{{ old('landing_guest_message_template', $guestSettings['landing_guest_message_template']) }}</textarea><div class="form-text">Gunakan <code>@{{nama}}</code> untuk nama tamu dan <code>@{{link}}</code> untuk link unik.</div></div>
+        <div class="col-12"><label class="form-label">Format pesan WhatsApp</label><textarea name="landing_guest_message_template" class="form-control" rows="4" required>{{ old('landing_guest_message_template', $guestSettings['landing_guest_message_template']) }}</textarea><div class="form-text">Gunakan <code>@{{nama}}</code> untuk nama tamu dan <code>@{{link}}</code> untuk link unik. Link akan dikirim sebagai URL yang dapat diklik di WhatsApp.</div></div>
         <div class="col-12 d-flex justify-content-end"><button class="btn btn-primary"><i class="fas fa-save me-1"></i>Simpan pengaturan</button></div>
     </form>
 </div>

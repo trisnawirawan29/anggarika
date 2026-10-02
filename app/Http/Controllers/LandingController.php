@@ -261,11 +261,17 @@ class LandingController extends Controller
 
         $invitationMessage = null;
         if ($guest !== null) {
+            $invitationUrl = route('invitation', $guest);
+            $messageTemplate = (string) $landing['landing_guest_message_template'];
             $invitationMessage = str_replace(
                 ['{{nama}}', '{{link}}'],
-                [$guest->name, route('invitation', $guest)],
-                (string) $landing['landing_guest_message_template'],
+                [$guest->name, $invitationUrl],
+                $messageTemplate,
             );
+
+            if (! str_contains($messageTemplate, '{{link}}')) {
+                $invitationMessage .= "\n\n".$invitationUrl;
+            }
         }
 
         $galleryItems = LandingGalleryItem::query()
