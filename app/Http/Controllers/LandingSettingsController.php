@@ -39,6 +39,9 @@ class LandingSettingsController extends Controller
     public function edit(Request $request): View
     {
         $settings = Setting::query()->pluck('value', 'key');
+        $settings['landing_guest_greeting'] ??= 'Kepada Yth.';
+        $settings['landing_guest_apology'] ??= 'Mohon maaf apabila ada kesalahan penulisan nama/alamat.';
+        $settings['landing_guest_message_template'] ??= "Halo {{nama}},\n\nKami mengundang Anda untuk hadir di acara pernikahan kami.\n\nBuka undangan: {{link}}";
         $sectionOrder = $this->sectionOrder($settings->get('landing_section_order'));
         $galleryItems = LandingGalleryItem::query()
             ->orderBy('sort_order')
@@ -66,6 +69,9 @@ class LandingSettingsController extends Controller
             'landing_hero_subtitle' => ['required', 'string', 'max:120'],
             'landing_hero_title' => ['required', 'string', 'max:120'],
             'landing_hero_date' => ['required', 'string', 'max:120'],
+            'landing_guest_greeting' => ['required', 'string', 'max:120'],
+            'landing_guest_apology' => ['required', 'string', 'max:500'],
+            'landing_guest_message_template' => ['required', 'string', 'max:2000'],
             'landing_countdown_date' => ['required', 'date_format:Y-m-d\\TH:i'],
             'landing_couple_title' => ['required', 'string', 'max:120'],
             'landing_bride_name' => ['required', 'string', 'max:120'],
@@ -144,6 +150,9 @@ class LandingSettingsController extends Controller
                 'landing_hero_subtitle' => ['type' => 'string', 'max' => 120],
                 'landing_hero_title' => ['type' => 'string', 'max' => 120],
                 'landing_hero_date' => ['type' => 'string', 'max' => 120],
+                'landing_guest_greeting' => ['type' => 'string', 'max' => 120],
+                'landing_guest_apology' => ['type' => 'string', 'max' => 500],
+                'landing_guest_message_template' => ['type' => 'string', 'max' => 2000],
             ],
             'countdown' => [
                 'landing_countdown_date' => ['type' => 'date_format:Y-m-d\\TH:i', 'max' => 16],
@@ -219,6 +228,15 @@ class LandingSettingsController extends Controller
                     'max:'.$maxLength,
                 ];
             }
+        }
+
+        foreach (['landing_guest_greeting' => 120, 'landing_guest_apology' => 500, 'landing_guest_message_template' => 2000] as $field => $maxLength) {
+            $rules[$field] = [
+                Rule::requiredIf($request->has($field)),
+                'nullable',
+                'string',
+                'max:'.$maxLength,
+            ];
         }
 
         foreach (['bride', 'groom'] as $person) {
@@ -342,7 +360,7 @@ class LandingSettingsController extends Controller
         }
 
         $sectionFields = [
-            'hero' => ['landing_section_hero', 'landing_page_title', 'landing_hero_subtitle', 'landing_hero_title', 'landing_hero_date', 'landing_hero_background'],
+            'hero' => ['landing_section_hero', 'landing_page_title', 'landing_hero_subtitle', 'landing_hero_title', 'landing_hero_date', 'landing_guest_greeting', 'landing_guest_apology', 'landing_guest_message_template', 'landing_hero_background'],
             'couple' => [
                 'landing_section_couple', 'landing_couple_title', 'landing_bride_name', 'landing_bride_bio', 'landing_groom_name', 'landing_groom_bio',
                 'landing_bride_photo', 'landing_groom_photo', 'landing_bride_name_font_size', 'landing_bride_name_font_family', 'landing_groom_name_font_size', 'landing_groom_name_font_family',

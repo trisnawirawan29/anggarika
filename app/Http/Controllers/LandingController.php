@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\InvitationGuest;
 use App\Models\LandingGalleryItem;
 use App\Models\RsvpMessage;
 use App\Models\Setting;
@@ -15,13 +16,16 @@ class LandingController extends Controller
         'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music',
     ];
 
-    public function __invoke(): View
+    public function __invoke(?InvitationGuest $guest = null): View
     {
         $defaults = [
             'landing_page_title' => 'Millar & Aliza · Wedding Invitation',
             'landing_hero_subtitle' => 'WERE GETTING MARRIED',
             'landing_hero_title' => 'Save Our Date',
             'landing_hero_date' => '25 December 2019',
+            'landing_guest_greeting' => 'Kepada Yth.',
+            'landing_guest_apology' => 'Mohon maaf apabila ada kesalahan penulisan nama/alamat.',
+            'landing_guest_message_template' => "Halo {{nama}},\n\nKami mengundang Anda untuk hadir di acara pernikahan kami.\n\nBuka undangan: {{link}}",
             'landing_countdown_date' => '2026-12-31T00:00',
             'landing_couple_title' => 'Happy Couple',
             'landing_bride_name' => 'Aliza Elizabeth',
@@ -204,6 +208,7 @@ class LandingController extends Controller
         ];
 
         $settings = Setting::query()->pluck('value', 'key');
+        abort_if($guest !== null && ! $guest->is_active, 404);
         $landing = collect($defaults)->mapWithKeys(
             fn (string $default, string $key): array => [$key => $settings->get($key, $default)]
         );
@@ -254,6 +259,15 @@ class LandingController extends Controller
             ? ''
             : (str_starts_with($musicFile, 'landing/') ? asset('storage/'.$musicFile) : asset($musicFile));
 
+        $invitationMessage = null;
+        if ($guest !== null) {
+            $invitationMessage = str_replace(
+                ['{{nama}}', '{{link}}'],
+                [$guest->name, route('invitation', $guest)],
+                (string) $landing['landing_guest_message_template'],
+            );
+        }
+
         $galleryItems = LandingGalleryItem::query()
             ->orderBy('sort_order')
             ->orderBy('id')
@@ -280,6 +294,6 @@ class LandingController extends Controller
             ->paginate(5)
             ->withQueryString();
 
-        return view('landing', compact('landing', 'galleryItems', 'rsvpMessages'));
+        return view('landing', compact('landing', 'galleryItems', 'rsvpMessages', 'guest', 'invitationMessage'));
     }
 }

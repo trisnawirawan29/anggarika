@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AdminInvitationGuestController;
 use App\Http\Controllers\AdminUserController;
 use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\SettingController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class)->name('landing');
+Route::get('/undangan/{guest:slug}', LandingController::class)->name('invitation');
 Route::post('/rsvp/messages', [RsvpMessageController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('rsvp.messages.store');
@@ -60,6 +62,7 @@ Route::middleware('auth')->group(function () {
         Route::put('/landing-settings/gallery/{galleryItem}', [LandingSettingsController::class, 'updateGalleryItem'])->name('landing-settings.gallery.update');
         Route::delete('/landing-settings/gallery/{galleryItem}', [LandingSettingsController::class, 'destroyGalleryItem'])->name('landing-settings.gallery.destroy');
         Route::delete('/rsvp/messages/{rsvpMessage}', [RsvpMessageController::class, 'destroy'])->name('rsvp.messages.destroy');
+        Route::resource('invitation-guests', AdminInvitationGuestController::class)->except(['show'])->names('invitation-guests');
         Route::get('/audit-logs', [AuditLogController::class, 'index'])->name('audit-logs');
     });
 });

@@ -112,6 +112,37 @@
         </header>
         <!-- end of header -->         
         @if ($landing['landing_section_hero'])
+        <style>
+            .guest-hero-note {
+                position: relative;
+                z-index: 2;
+                max-width: 440px;
+                margin: 24px auto 0;
+                padding: 14px 20px;
+                border-top: 1px solid rgba(255, 255, 255, .45);
+                border-bottom: 1px solid rgba(255, 255, 255, .45);
+                color: #fff;
+                text-align: center;
+            }
+
+            .guest-hero-note p {
+                margin: 0;
+                color: #fff;
+            }
+
+            .guest-hero-note .guest-hero-greeting,
+            .guest-hero-note .guest-hero-apology {
+                font-size: 14px;
+                line-height: 1.5;
+            }
+
+            .guest-hero-note h3 {
+                margin: 4px 0;
+                color: #fff;
+                font-size: clamp(26px, 4vw, 42px);
+                font-family: 'Great Vibes', cursive;
+            }
+        </style>
         <!-- start of hero -->
         <section class="hero-slider hero-style-3" data-landing-section="hero">
             <div class="slide-wrapper">
@@ -131,6 +162,13 @@
                                 <div data-swiper-parallax="400" class="slide-text">
                                     <p>{{ $landing['landing_hero_date'] }}</p>
                                 </div>
+                                @if ($guest)
+                                <div class="guest-hero-note" data-swiper-parallax="500">
+                                    <p class="guest-hero-greeting">{{ $landing['landing_guest_greeting'] }}</p>
+                                    <h3>{{ $guest->name }}</h3>
+                                    <p class="guest-hero-apology">{{ $landing['landing_guest_apology'] }}</p>
+                                </div>
+                                @endif
                                 <div class="clearfix"></div>
                             </div>
                         </div>
