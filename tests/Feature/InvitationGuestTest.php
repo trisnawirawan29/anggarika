@@ -45,6 +45,47 @@ class InvitationGuestTest extends TestCase
         $this->get(route('invitation', $guest))->assertNotFound();
     }
 
+    public function test_personal_invitation_can_save_attendance_choice(): void
+    {
+        $guest = InvitationGuest::factory()->create();
+
+        $response = $this->patchJson(route('invitation.rsvp.update', $guest), [
+            'status' => 'attending',
+        ]);
+
+        $response->assertOk()->assertJson([
+            'status' => 'attending',
+            'message' => 'Terima kasih, kehadiran Anda sudah dikonfirmasi.',
+        ]);
+        $this->assertDatabaseHas('invitation_guests', [
+            'id' => $guest->id,
+            'rsvp_status' => 'attending',
+        ]);
+    }
+
+    public function test_personal_invitation_rejects_invalid_attendance_choice(): void
+    {
+        $guest = InvitationGuest::factory()->create();
+
+        $this->patchJson(route('invitation.rsvp.update', $guest), [
+            'status' => 'maybe',
+        ])->assertUnprocessable()->assertJsonValidationErrors('status');
+
+        $this->assertDatabaseMissing('invitation_guests', [
+            'id' => $guest->id,
+            'rsvp_status' => 'maybe',
+        ]);
+    }
+
+    public function test_inactive_guest_cannot_update_attendance(): void
+    {
+        $guest = InvitationGuest::factory()->create(['is_active' => false]);
+
+        $this->patchJson(route('invitation.rsvp.update', $guest), [
+            'status' => 'attending',
+        ])->assertNotFound();
+    }
+
     public function test_admin_can_add_an_invitation_guest(): void
     {
         $role = Role::where('slug', 'admin')->firstOrFail();

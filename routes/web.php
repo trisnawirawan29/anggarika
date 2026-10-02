@@ -7,6 +7,7 @@ use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoogleAuthController;
+use App\Http\Controllers\InvitationGuestRsvpController;
 use App\Http\Controllers\LandingController;
 use App\Http\Controllers\LandingSettingsController;
 use App\Http\Controllers\NotificationController;
@@ -16,6 +17,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', LandingController::class)->name('landing');
 Route::get('/undangan/{guest:slug}', LandingController::class)->name('invitation');
+Route::patch('/undangan/{guest:slug}/rsvp', [InvitationGuestRsvpController::class, 'update'])
+    ->middleware('throttle:10,1')
+    ->name('invitation.rsvp.update');
 Route::post('/rsvp/messages', [RsvpMessageController::class, 'store'])
     ->middleware('throttle:10,1')
     ->name('rsvp.messages.store');

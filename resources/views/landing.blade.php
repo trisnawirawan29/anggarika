@@ -1306,6 +1306,103 @@
                 text-align: center;
             }
 
+            .rsvp-modern .guest-attendance {
+                max-width: 610px;
+                margin: 0 auto 34px;
+                padding: 24px;
+                border: 1px solid rgba(133, 170, 186, .3);
+                border-radius: 18px;
+                background: linear-gradient(145deg, #f9fcfd, #eef6f8);
+                text-align: center;
+            }
+
+            .rsvp-modern .guest-attendance-title {
+                margin: 0 0 6px;
+                color: #557f91;
+                font-size: 18px;
+                font-weight: 700;
+            }
+
+            .rsvp-modern .guest-attendance-description {
+                margin: 0 0 17px;
+                color: #718188;
+                font-size: 14px;
+            }
+
+            .rsvp-modern .guest-attendance-options {
+                display: flex;
+                justify-content: center;
+                gap: 12px;
+            }
+
+            .rsvp-modern .guest-attendance-button {
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 175px;
+                padding: 12px 20px;
+                overflow: hidden;
+                border: 1px solid transparent;
+                border-radius: 999px;
+                color: #fff;
+                font-weight: 700;
+                cursor: pointer;
+                box-shadow: 0 9px 18px rgba(56, 92, 105, .16);
+                transition: transform .2s ease, box-shadow .2s ease, opacity .2s ease;
+            }
+
+            .rsvp-modern .guest-attendance-button::before {
+                position: absolute;
+                top: 0;
+                bottom: 0;
+                left: -70%;
+                width: 45%;
+                content: '';
+                background: rgba(255, 255, 255, .24);
+                transform: skewX(-20deg);
+                transition: left .5s ease;
+            }
+
+            .rsvp-modern .guest-attendance-button:hover,
+            .rsvp-modern .guest-attendance-button.is-selected {
+                transform: translateY(-2px);
+                box-shadow: 0 13px 24px rgba(56, 92, 105, .25);
+            }
+
+            .rsvp-modern .guest-attendance-button:hover::before {
+                left: 125%;
+            }
+
+            .rsvp-modern .guest-attendance-button:disabled {
+                cursor: wait;
+                opacity: .65;
+            }
+
+            .rsvp-modern .guest-attendance-button.is-selected {
+                outline: 3px solid rgba(85, 127, 145, .2);
+                outline-offset: 3px;
+            }
+
+            .rsvp-modern .guest-attendance-button--yes {
+                background: linear-gradient(135deg, #74b99a, #3c8c70);
+            }
+
+            .rsvp-modern .guest-attendance-button--no {
+                background: linear-gradient(135deg, #c49a9a, #9b6565);
+            }
+
+            .rsvp-modern .guest-attendance-button i {
+                margin-right: 8px;
+            }
+
+            .rsvp-modern .guest-attendance-feedback {
+                min-height: 20px;
+                margin: 15px 0 0;
+                color: #557f91;
+                font-size: 13px;
+            }
+
             .rsvp-modern .rsvp-message-form {
                 margin-bottom: clamp(34px, 6vw, 58px);
                 padding: clamp(20px, 4vw, 34px);
@@ -1473,6 +1570,14 @@
                     display: block;
                     margin-top: 3px;
                 }
+
+                .rsvp-modern .guest-attendance-options {
+                    flex-direction: column;
+                }
+
+                .rsvp-modern .guest-attendance-button {
+                    width: 100%;
+                }
             }
         </style>
         <div id="rsvp" class="rsvp-area rsvp-modern go-rsvp-area" data-landing-section="rsvp" style="background-image: url('{{ $landing['landing_rsvp_background'] }}');">
@@ -1486,6 +1591,21 @@
                                 </div>
                             </div>
                             <p class="rsvp-description">{{ $landing['landing_rsvp_description'] }}</p>
+                            @if ($guest)
+                                <div class="guest-attendance" data-guest-rsvp data-endpoint="{{ route('invitation.rsvp.update', $guest) }}">
+                                    <h3 class="guest-attendance-title">Konfirmasi kehadiran</h3>
+                                    <p class="guest-attendance-description">{{ $guest->name }}, apakah Anda dapat hadir di acara kami?</p>
+                                    <div class="guest-attendance-options" role="group" aria-label="Pilihan kehadiran">
+                                        <button type="button" class="guest-attendance-button guest-attendance-button--yes {{ $guest->rsvp_status === 'attending' ? 'is-selected' : '' }}" data-rsvp-status="attending">
+                                            <i class="fa fa-heart" aria-hidden="true"></i>Hadir
+                                        </button>
+                                        <button type="button" class="guest-attendance-button guest-attendance-button--no {{ $guest->rsvp_status === 'declined' ? 'is-selected' : '' }}" data-rsvp-status="declined">
+                                            <i class="fa fa-heart-o" aria-hidden="true"></i>Tidak hadir
+                                        </button>
+                                    </div>
+                                    <p class="guest-attendance-feedback" data-rsvp-feedback aria-live="polite"></p>
+                                </div>
+                            @endif
                             @if (session('rsvp_success'))
                                 <div class="rsvp-feedback">{{ session('rsvp_success') }}</div>
                             @endif
@@ -1822,6 +1942,51 @@
     <!-- Custom script for this template -->
     <script src="{{ asset('assets/js/script.js') }}"></script>
     <script>
+        (() => {
+            const attendance = document.querySelector('[data-guest-rsvp]');
+            if (!attendance) {
+                return;
+            }
+
+            const buttons = [...attendance.querySelectorAll('[data-rsvp-status]')];
+            const feedback = attendance.querySelector('[data-rsvp-feedback]');
+
+            buttons.forEach((button) => button.addEventListener('click', async () => {
+                buttons.forEach((item) => {
+                    item.disabled = true;
+                });
+                feedback.textContent = 'Menyimpan pilihan...';
+
+                try {
+                    const response = await fetch(attendance.dataset.endpoint, {
+                        method: 'PATCH',
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': @json(csrf_token()),
+                        },
+                        body: JSON.stringify({ status: button.dataset.rsvpStatus }),
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('RSVP gagal disimpan.');
+                    }
+
+                    const result = await response.json();
+                    buttons.forEach((item) => {
+                        item.classList.toggle('is-selected', item.dataset.rsvpStatus === result.status);
+                    });
+                    feedback.textContent = result.message;
+                } catch (error) {
+                    feedback.textContent = error.message;
+                } finally {
+                    buttons.forEach((item) => {
+                        item.disabled = false;
+                    });
+                }
+            }));
+        })();
+
         (() => {
             const wrapper = document.querySelector('.page-wrapper');
             const sectionOrder = @json($landing['landing_section_order']);

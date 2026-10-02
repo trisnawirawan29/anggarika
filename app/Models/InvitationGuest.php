@@ -13,7 +13,7 @@ class InvitationGuest extends Model
     use HasFactory;
 
     /** @var list<string> */
-    protected $fillable = ['name', 'slug', 'phone', 'is_active'];
+    protected $fillable = ['name', 'slug', 'phone', 'is_active', 'rsvp_status'];
 
     protected static function booted(): void
     {
