@@ -64,6 +64,25 @@ class LandingSettingsController extends Controller
 
     public function update(Request $request): RedirectResponse
     {
+        $selectedSection = $request->validate([
+            'save_section' => ['required', Rule::in(['guest_message', ...self::LANDING_SECTION_ORDER, 'order'])],
+        ])['save_section'];
+
+        if ($selectedSection === 'guest_message') {
+            $data = $request->validate([
+                'landing_guest_message_template' => ['required', 'string', 'max:2000'],
+            ]);
+
+            Setting::updateOrCreate(
+                ['key' => 'landing_guest_message_template'],
+                ['value' => $data['landing_guest_message_template']],
+            );
+
+            AuditLogger::record('landing_settings.updated', 'Format pesan WhatsApp diperbarui.', null, [], ['keys' => array_keys($data)]);
+
+            return back()->with('success', 'Format pesan WhatsApp berhasil disimpan.');
+        }
+
         $rules = [
             'landing_page_title' => ['required', 'string', 'max:160'],
             'landing_hero_subtitle' => ['required', 'string', 'max:120'],
@@ -105,6 +124,7 @@ class LandingSettingsController extends Controller
             ...array_fill_keys(array_map(fn (int $number): string => 'landing_event_'.$number.'_enabled', range(1, 4)), ['required', 'boolean']),
             'landing_people_title' => ['required', 'string', 'max:120'],
             'landing_gallery_title' => ['required', 'string', 'max:120'],
+            'landing_gallery_columns' => ['required', 'integer', 'between:1,6'],
             'landing_gift_title' => ['required', 'string', 'max:120'],
             'landing_rsvp_description' => ['required', 'string', 'max:1000'],
             'landing_gift_description' => ['required', 'string', 'max:1000'],
@@ -197,6 +217,7 @@ class LandingSettingsController extends Controller
             ],
             'gallery' => [
                 'landing_gallery_title' => ['type' => 'string', 'max' => 120],
+                'landing_gallery_columns' => ['type' => 'integer', 'max' => 6],
             ],
             'rsvp' => [
                 'landing_rsvp_title' => ['type' => 'string', 'max' => 120],
@@ -229,6 +250,13 @@ class LandingSettingsController extends Controller
                 ];
             }
         }
+
+        $rules['landing_gallery_columns'] = [
+            Rule::requiredIf($request->boolean('landing_section_gallery')),
+            'nullable',
+            'integer',
+            'between:1,6',
+        ];
 
         foreach (['landing_guest_greeting' => 120, 'landing_guest_apology' => 500, 'landing_guest_message_template' => 2000] as $field => $maxLength) {
             $rules[$field] = [
@@ -409,7 +437,7 @@ class LandingSettingsController extends Controller
             )],
             'people' => ['landing_section_people', 'landing_people_title'],
             'cta_gallery' => ['landing_section_cta_gallery', 'landing_cta_gallery_title', 'landing_cta_gallery_text', 'landing_cta_gallery_rsvp_label', 'landing_cta_gallery_rsvp_url', 'landing_cta_gallery_location_label', 'landing_cta_gallery_location_url', 'landing_cta_gallery_rsvp_enabled', 'landing_cta_gallery_location_enabled', 'landing_cta_gallery_background'],
-            'gallery' => ['landing_section_gallery', 'landing_gallery_title', ...array_map(fn (int $number): string => 'landing_gallery_photo_'.$number, range(1, 6))],
+            'gallery' => ['landing_section_gallery', 'landing_gallery_title', 'landing_gallery_columns', ...array_map(fn (int $number): string => 'landing_gallery_photo_'.$number, range(1, 6))],
             'gta' => ['landing_section_gta'],
             'gift' => ['landing_section_gift', 'landing_gift_title', 'landing_gift_description', 'landing_gift_bank_name', 'landing_gift_account_number', 'landing_gift_account_holder'],
             'music' => ['landing_section_music', 'landing_music_file'],
@@ -417,9 +445,7 @@ class LandingSettingsController extends Controller
             'order' => ['landing_section_order'],
         ];
 
-        $section = $request->validate([
-            'save_section' => ['required', Rule::in(array_keys($sectionFields))],
-        ])['save_section'];
+        $section = $selectedSection;
         $data = $request->validate(array_intersect_key($rules, array_flip($sectionFields[$section])));
 
         if ($section === 'order') {

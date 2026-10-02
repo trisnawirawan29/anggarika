@@ -81,6 +81,26 @@ class LandingSectionOrderTest extends TestCase
         $this->assertStringContainsString('alt="Foto galeri"', $content);
     }
 
+    public function test_admin_can_configure_gallery_columns(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'gallery',
+                'landing_section_gallery' => '1',
+                'landing_gallery_title' => 'Galeri Pernikahan',
+                'landing_gallery_columns' => '3',
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        $this->assertSame('3', Setting::value('landing_gallery_columns'));
+        $this->get(route('landing'))
+            ->assertSee('--gallery-columns: 3;', false);
+    }
+
     public function test_admin_can_configure_each_event_and_hide_disabled_events(): void
     {
         $adminRole = Role::where('slug', 'admin')->firstOrFail();

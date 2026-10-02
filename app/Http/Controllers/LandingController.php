@@ -150,6 +150,7 @@ class LandingController extends Controller
             'landing_schedule_6_location_url' => 'https://maps.google.com/?q=Lokasi+acara',
             'landing_people_title' => 'Groomsmen & Bridesmaid',
             'landing_gallery_title' => 'Our Gallery',
+            'landing_gallery_columns' => '4',
             'landing_gift_title' => 'Gift Registration',
             'landing_rsvp_description' => 'Sampaikan doa dan ucapan terbaik Anda untuk menjadi bagian dari hari bahagia kami.',
             'landing_gift_description' => 'Your presence is the greatest gift. If you would like to send a wedding gift, you may use the account details below.',

@@ -1191,14 +1191,21 @@
         @if ($landing['landing_section_gallery'])
         <!--Start project area-->  
         <style>
+            .gallery-section .gallery-centered {
+                --gallery-columns: {{ max(1, min(6, (int) ($landing['landing_gallery_columns'] ?? 4))) }};
+                --gallery-gap: clamp(8px, 1.5vw, 18px);
+            }
+
             .gallery-section .masonry-gallery .grid {
-                width: 25%;
+                flex: 0 0 calc((100% - ((var(--gallery-columns) - 1) * var(--gallery-gap))) / var(--gallery-columns));
+                width: auto;
             }
 
             .gallery-section .gallery-centered {
                 display: flex;
                 flex-wrap: wrap;
                 justify-content: center;
+                gap: var(--gallery-gap);
                 margin-top: clamp(24px, 4vw, 48px);
                 height: auto !important;
             }
@@ -1217,25 +1224,32 @@
                 transform: none !important;
             }
 
+            .gallery-section .masonry-gallery .grid a {
+                display: block;
+                height: 100%;
+            }
+
             .gallery-section .masonry-gallery .grid img {
-                height: 220px;
+                display: block;
+                width: 100%;
+                aspect-ratio: 1 / 1;
+                height: auto;
                 object-fit: cover;
                 border-radius: 12px;
             }
 
             @media (max-width: 767px) {
+                .gallery-section .gallery-centered {
+                    --gallery-columns: {{ min(3, max(1, min(6, (int) ($landing['landing_gallery_columns'] ?? 4)))) }};
+                    --gallery-gap: 8px;
+                }
+
                 .gallery-section .masonry-gallery .grid {
-                    width: 50%;
+                    width: auto;
                 }
 
                 .gallery-section .masonry-gallery .grid img {
-                    height: 170px;
-                }
-            }
-
-            @media (max-width: 550px) {
-                .gallery-section .masonry-gallery .grid {
-                    width: 100%;
+                    border-radius: 8px;
                 }
             }
         </style>
