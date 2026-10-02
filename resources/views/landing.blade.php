@@ -90,20 +90,6 @@
                             @if ($landing['landing_section_rsvp'])
                             <li><a href="#rsvp">RSVP</a></li>
                             @endif
-                            <li class="menu-item-has-children">
-                                <a href="javascript:void(0);">Blog</a>
-                                <ul class="sub-menu">
-                                    <li><a href="blog.html">Blog</a></li>
-                                    <li><a href="blog-width-sidebar.html">Blog With Sidebar</a></li>
-                                    <li class="menu-item-has-children">
-                                        <a href="#Level3">Blog Details</a>
-                                        <ul class="sub-menu">
-                                            <li><a href="blog-single.html">Blog Details</a></li>
-                                            <li><a href="blog-single-sidebar.html">Blog Details Sidebar</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                            </li>
                         </ul>
                     </div><!-- end of nav-collapse -->
                     <div class="bottom-border"></div>
