@@ -1342,6 +1342,17 @@
                 resize: vertical;
             }
 
+            .rsvp-modern .rsvp-captcha {
+                margin-bottom: 20px;
+            }
+
+            .rsvp-modern .rsvp-captcha-label {
+                display: block;
+                margin-bottom: 8px;
+                color: #557f91;
+                font-weight: 600;
+            }
+
             .rsvp-modern .rsvp-submit {
                 display: inline-flex;
                 align-items: center;
@@ -1478,13 +1489,17 @@
                             @if (session('rsvp_success'))
                                 <div class="rsvp-feedback">{{ session('rsvp_success') }}</div>
                             @endif
-                            @if ($errors->has('name') || $errors->has('message'))
-                                <div class="rsvp-feedback rsvp-errors">{{ $errors->first('name') ?: $errors->first('message') }}</div>
+                            @if ($errors->hasAny(['name', 'message', 'captcha_answer']))
+                                <div class="rsvp-feedback rsvp-errors">{{ $errors->first('name') ?: ($errors->first('message') ?: $errors->first('captcha_answer')) }}</div>
                             @endif
                             <form action="{{ route('rsvp.messages.store') }}" method="POST" class="rsvp-message-form">
                                 @csrf
                                 <input type="text" name="name" class="rsvp-field" placeholder="Tuliskan nama lengkap Anda" maxlength="80" value="{{ old('name') }}" required>
                                 <textarea name="message" class="rsvp-field" placeholder="Tuliskan ucapan dan doa untuk pasangan..." maxlength="1000" required>{{ old('message') }}</textarea>
+                                <div class="rsvp-captcha">
+                                    <label class="rsvp-captcha-label" for="captcha_answer">Verifikasi sederhana: {{ $captchaQuestion }}</label>
+                                    <input id="captcha_answer" type="number" name="captcha_answer" class="rsvp-field" placeholder="Masukkan jawabannya" min="0" max="18" value="{{ old('captcha_answer') }}" required>
+                                </div>
                                 <div class="text-center"><button type="submit" class="rsvp-submit"><i class="fa fa-paper-plane me-2" aria-hidden="true"></i>Kirim ucapan</button></div>
                             </form>
                             <h3 class="rsvp-messages-title">Ucapan &amp; Doa</h3>

@@ -174,10 +174,12 @@ class LandingSectionOrderTest extends TestCase
     {
         RsvpMessage::query()->create(['name' => 'Pesan Lama', 'message' => 'Ucapan lama.']);
 
-        $this->post(route('rsvp.messages.store'), [
-            'name' => 'Pesan Baru',
-            'message' => 'Semoga bahagia selalu.',
-        ])->assertRedirect(route('landing').'#rsvp');
+        $this->withSession(['rsvp_captcha_answer' => 7])
+            ->post(route('rsvp.messages.store'), [
+                'name' => 'Pesan Baru',
+                'message' => 'Semoga bahagia selalu.',
+                'captcha_answer' => 7,
+            ])->assertRedirect(route('landing').'#rsvp');
 
         $this->assertDatabaseHas('rsvp_messages', [
             'name' => 'Pesan Baru',
@@ -193,6 +195,21 @@ class LandingSectionOrderTest extends TestCase
             strpos($content, 'Pesan Lama'),
             strpos($content, 'Pesan Baru'),
         );
+    }
+
+    public function test_guest_cannot_submit_rsvp_message_with_an_incorrect_captcha(): void
+    {
+        $this->withSession(['rsvp_captcha_answer' => 7])
+            ->post(route('rsvp.messages.store'), [
+                'name' => 'Tamu Baru',
+                'message' => 'Semoga bahagia selalu.',
+                'captcha_answer' => 8,
+            ])
+            ->assertSessionHasErrors(['captcha_answer' => 'Jawaban CAPTCHA salah.']);
+
+        $this->assertDatabaseMissing('rsvp_messages', [
+            'name' => 'Tamu Baru',
+        ]);
     }
 
     public function test_admin_can_delete_an_rsvp_message(): void

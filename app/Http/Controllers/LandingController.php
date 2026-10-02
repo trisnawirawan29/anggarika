@@ -301,6 +301,11 @@ class LandingController extends Controller
             ->paginate(5)
             ->withQueryString();
 
-        return view('landing', compact('landing', 'galleryItems', 'rsvpMessages', 'guest', 'invitationMessage'));
+        $captchaFirstNumber = random_int(1, 9);
+        $captchaSecondNumber = random_int(1, 9);
+        session()->put('rsvp_captcha_answer', $captchaFirstNumber + $captchaSecondNumber);
+        $captchaQuestion = $captchaFirstNumber.' + '.$captchaSecondNumber.' = ?';
+
+        return view('landing', compact('landing', 'galleryItems', 'rsvpMessages', 'guest', 'invitationMessage', 'captchaQuestion'));
     }
 }
