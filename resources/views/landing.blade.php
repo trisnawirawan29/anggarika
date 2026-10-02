@@ -989,7 +989,7 @@
                             <p><i class="fa fa-clock-o" aria-hidden="true"></i>{{ $landing['landing_schedule_'.$number.'_time'] }}</p>
                             <p class="schedule-address"><i class="fa fa-map-marker" aria-hidden="true"></i><span>{{ $landing['landing_schedule_'.$number.'_location'] }}</span></p>
                             @if ($landing['landing_schedule_'.$number.'_location_enabled'])
-                                <a class="schedule-location-button popup-gmaps" href="{{ $landing['landing_schedule_'.$number.'_location_url'] }}"><i class="fa fa-map-marker" aria-hidden="true"></i>Lihat lokasi</a>
+                                <a class="schedule-location-button" href="{{ $landing['landing_schedule_'.$number.'_location_url'] }}" target="_blank" rel="noopener noreferrer"><i class="fa fa-map-marker" aria-hidden="true"></i>Lihat lokasi</a>
                             @endif
                         </article>
                     @endfor
