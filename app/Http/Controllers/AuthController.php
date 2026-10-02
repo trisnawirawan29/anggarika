@@ -22,7 +22,13 @@ class AuthController extends Controller
             return redirect()->route('dashboard');
         }
 
-        return view('auth.login');
+        $captchaFirstNumber = random_int(1, 9);
+        $captchaSecondNumber = random_int(1, 9);
+        session()->put('login_captcha_answer', $captchaFirstNumber + $captchaSecondNumber);
+
+        return view('auth.login', [
+            'captchaQuestion' => $captchaFirstNumber.' + '.$captchaSecondNumber.' = ?',
+        ]);
     }
 
     public function showRegister(): View|RedirectResponse
@@ -57,14 +63,27 @@ class AuthController extends Controller
 
     public function login(Request $request): RedirectResponse
     {
-        $credentials = $request->validate([
+        $data = $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required', 'string'],
+            'captcha_answer' => [
+                'required',
+                'integer',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if ((int) $value !== (int) session('login_captcha_answer', -1)) {
+                        $fail('Jawaban CAPTCHA salah.');
+                    }
+                },
+            ],
         ], [
             'email.required' => 'Email wajib diisi.',
             'email.email' => 'Format email tidak valid.',
             'password.required' => 'Password wajib diisi.',
         ]);
+        $credentials = [
+            'email' => $data['email'],
+            'password' => $data['password'],
+        ];
 
         $key = Str::transliterate(Str::lower($request->string('email')).'|'.$request->ip());
         if (RateLimiter::tooManyAttempts($key, 5)) {
