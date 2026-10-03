@@ -12,7 +12,7 @@ class LandingController extends Controller
 {
     /** @var list<string> */
     private const LANDING_SECTION_ORDER = [
-        'hero', 'couple', 'countdown', 'story', 'cta', 'event', 'schedule', 'people', 'cta_gallery',
+        'hero', 'couple', 'countdown', 'story', 'video', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'penutup',
         'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music',
     ];
 
@@ -65,6 +65,13 @@ class LandingController extends Controller
             'landing_story_4_title' => 'Our Engagement',
             'landing_story_4_date' => 'Jul 14 2019',
             'landing_story_4_text' => 'A wonderful serenity has taken possession of my entire soul, like these sweet mornings of spring which I enjoy with my whole heart. I am alone, and feel the charm of existence in this spot, which was created for the bliss of souls like mine. I am so happy, my dear friend,',
+            'landing_video_title' => 'Video',
+            'landing_video_source' => 'youtube',
+            'landing_video_youtube_url' => '',
+            'landing_penutup_title' => 'Sampai Jumpa di Hari Bahagia Kami',
+            'landing_penutup_text' => 'Terima kasih telah menjadi bagian dari cerita dan kebahagiaan kami.',
+            'landing_penutup_button_label' => 'Kirim Ucapan',
+            'landing_penutup_button_url' => '#rsvp',
             'landing_cta_title' => 'Welcome to our big day',
             'landing_cta_title_font_size' => '42',
             'landing_cta_title_font_family' => 'inherit',
@@ -169,6 +176,8 @@ class LandingController extends Controller
             'landing_section_couple' => true,
             'landing_section_countdown' => true,
             'landing_section_story' => true,
+            'landing_section_video' => true,
+            'landing_section_penutup' => true,
             'landing_story_1_enabled' => true,
             'landing_story_2_enabled' => true,
             'landing_story_3_enabled' => true,
@@ -246,6 +255,7 @@ class LandingController extends Controller
             'landing_countdown_background' => 'assets/images/counter/1.jpg',
             'landing_cta_background' => 'assets/images/cta/img-1.jpg',
             'landing_cta_gallery_background' => 'assets/images/cta/img-1.jpg',
+            'landing_penutup_background' => 'assets/images/cta/img-1.jpg',
             'landing_rsvp_background' => 'assets/images/rsvp/img-1.jpg',
             'landing_footer_background' => 'assets/images/footer-bg.jpg',
         ];
@@ -255,6 +265,11 @@ class LandingController extends Controller
                 : asset($settings->get($key, $default))]
         );
         $landing = $landing->merge($photos);
+        $videoFile = (string) $settings->get('landing_video_file', '');
+        $landing['landing_video_file'] = $videoFile === ''
+            ? ''
+            : (str_starts_with($videoFile, 'landing/') ? asset('storage/'.$videoFile) : asset($videoFile));
+        $landing['landing_video_youtube_embed'] = $this->youtubeEmbedUrl((string) $landing['landing_video_youtube_url']);
         $musicFile = (string) $settings->get('landing_music_file', '');
         $landing['landing_music_file'] = $musicFile === ''
             ? ''
@@ -307,5 +322,29 @@ class LandingController extends Controller
         $captchaQuestion = $captchaFirstNumber.' + '.$captchaSecondNumber.' = ?';
 
         return view('landing', compact('landing', 'galleryItems', 'rsvpMessages', 'guest', 'invitationMessage', 'captchaQuestion'));
+    }
+
+    private function youtubeEmbedUrl(string $url): ?string
+    {
+        $parts = parse_url($url);
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        $videoId = null;
+
+        if ($host === 'youtu.be') {
+            $videoId = trim((string) ($parts['path'] ?? ''), '/');
+        } elseif (in_array($host, ['youtube.com', 'www.youtube.com', 'm.youtube.com'], true)) {
+            if (($parts['path'] ?? '') === '/watch') {
+                parse_str((string) ($parts['query'] ?? ''), $query);
+                $videoId = $query['v'] ?? null;
+            } elseif (str_starts_with((string) ($parts['path'] ?? ''), '/embed/')) {
+                $videoId = trim(substr((string) $parts['path'], 7), '/');
+            } elseif (str_starts_with((string) ($parts['path'] ?? ''), '/shorts/')) {
+                $videoId = trim(substr((string) $parts['path'], 7), '/');
+            }
+        }
+
+        return is_string($videoId) && preg_match('/^[A-Za-z0-9_-]{11}$/', $videoId) === 1
+            ? 'https://www.youtube.com/embed/'.$videoId
+            : null;
     }
 }

@@ -20,7 +20,7 @@ class LandingSectionOrderTest extends TestCase
     {
         $adminRole = Role::where('slug', 'admin')->firstOrFail();
         $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
-        $order = ['hero', 'story', 'couple', 'countdown', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
+        $order = ['hero', 'story', 'couple', 'countdown', 'video', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'penutup', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
 
         $response = $this->actingAs($admin)
             ->put(route('admin.landing-settings.update'), [
@@ -34,7 +34,7 @@ class LandingSectionOrderTest extends TestCase
 
     public function test_landing_page_renders_sections_in_saved_order(): void
     {
-        $order = ['hero', 'story', 'couple', 'countdown', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
+        $order = ['hero', 'story', 'couple', 'countdown', 'video', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'penutup', 'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music'];
         Setting::updateOrCreate(['key' => 'landing_section_order'], ['value' => json_encode($order)]);
 
         $content = $this->get(route('landing'))->assertOk()->getContent();
@@ -57,6 +57,49 @@ class LandingSectionOrderTest extends TestCase
             ->assertJsonStructure(['url']);
 
         Storage::disk('public')->assertExists((string) Setting::value('landing_music_file'));
+    }
+
+    public function test_admin_can_configure_youtube_video_section(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'video',
+                'landing_section_video' => '1',
+                'landing_video_title' => 'Video Pernikahan',
+                'landing_video_source' => 'youtube',
+                'landing_video_youtube_url' => 'https://youtu.be/dQw4w9WgXcQ',
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        $content = $this->get(route('landing'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('Video Pernikahan', $content);
+        $this->assertStringContainsString('https://www.youtube.com/embed/dQw4w9WgXcQ', $content);
+    }
+
+    public function test_admin_can_upload_video_file(): void
+    {
+        Storage::fake('public');
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'video',
+                'landing_section_video' => '1',
+                'landing_video_title' => 'Video Upload',
+                'landing_video_source' => 'upload',
+                'landing_video_youtube_url' => '',
+                'landing_video_file' => UploadedFile::fake()->create('wedding.mp4', 100, 'video/mp4'),
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        Storage::disk('public')->assertExists((string) Setting::value('landing_video_file'));
     }
 
     public function test_admin_can_add_gallery_photos_with_categories(): void
@@ -99,6 +142,30 @@ class LandingSectionOrderTest extends TestCase
         $this->assertSame('3', Setting::value('landing_gallery_columns'));
         $this->get(route('landing'))
             ->assertSee('--gallery-columns: 3;', false);
+    }
+
+    public function test_admin_can_configure_penutup_section(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'penutup',
+                'landing_section_penutup' => '1',
+                'landing_penutup_title' => 'Sampai Jumpa',
+                'landing_penutup_text' => 'Terima kasih atas kehadiran Anda.',
+                'landing_penutup_button_label' => 'Kirim ucapan',
+                'landing_penutup_button_url' => '#rsvp',
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        $this->assertSame('Sampai Jumpa', Setting::value('landing_penutup_title'));
+        $this->get(route('landing'))
+            ->assertSee('Sampai Jumpa')
+            ->assertSee('Terima kasih atas kehadiran Anda.')
+            ->assertSee('data-landing-section="penutup"', false);
     }
 
     public function test_admin_can_configure_each_event_and_hide_disabled_events(): void
