@@ -216,7 +216,7 @@
             <input type="hidden" name="landing_section_order" value="{{ json_encode($sectionOrder) }}">
             <ol class="landing-section-order-list" aria-label="Urutan section landing page">
                 @php
-                    $sectionLabels = ['hero' => 'Hero', 'couple' => 'Pasangan', 'countdown' => 'Countdown', 'story' => 'Cerita', 'cta' => 'CTA', 'event' => 'Acara', 'schedule' => 'Jadwal acara', 'people' => 'Keluarga & teman', 'cta_gallery' => 'CTA sebelum galeri', 'gallery' => 'Galeri', 'rsvp' => 'RSVP', 'gta' => 'Informasi perjalanan', 'gift' => 'Gift registration', 'footer' => 'Footer', 'music' => 'Music player'];
+                    $sectionLabels = ['hero' => 'Hero', 'couple' => 'Pasangan', 'countdown' => 'Countdown', 'story' => 'Cerita', 'video' => 'Video', 'cta' => 'CTA', 'event' => 'Acara', 'schedule' => 'Jadwal acara', 'people' => 'Keluarga & teman', 'cta_gallery' => 'CTA sebelum galeri', 'penutup' => 'Penutup', 'gallery' => 'Galeri', 'rsvp' => 'RSVP', 'gta' => 'Informasi perjalanan', 'gift' => 'Gift registration', 'footer' => 'Footer', 'music' => 'Music player'];
                 @endphp
                 @foreach ($sectionOrder as $sectionKey)
                     <li class="landing-section-order-item" draggable="true" data-section="{{ $sectionKey }}"><i class="fas fa-grip-vertical text-muted"></i><span>{{ $sectionLabels[$sectionKey] }}</span></li>
@@ -247,6 +247,32 @@
                         </div>
                     </div>
                 @endforeach
+            </div>
+        </div>
+
+        <div class="content-card mb-4">
+            <div class="section-title"><span class="section-number">05</span><div><h5>Video</h5><p>Tampilkan momen spesial melalui upload video langsung atau link YouTube.</p></div></div>
+            <div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_video" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_video" name="landing_section_video" value="1" @checked(old('landing_section_video', $settings['landing_section_video'] ?? '1'))><label class="form-check-label" for="landing_section_video">Tampilkan section video</label></div>
+            <div class="row g-3">
+                <div class="col-md-6"><label class="form-label">Judul section video</label><input name="landing_video_title" class="form-control" value="{{ old('landing_video_title', $settings['landing_video_title'] ?? 'Video') }}" required></div>
+                <div class="col-md-6"><label class="form-label">Sumber video</label><select name="landing_video_source" class="form-select" required><option value="youtube" @selected(old('landing_video_source', $settings['landing_video_source'] ?? 'youtube') === 'youtube')>Link YouTube</option><option value="upload" @selected(old('landing_video_source', $settings['landing_video_source'] ?? 'youtube') === 'upload')>Upload video</option></select></div>
+                <div class="col-12"><label class="form-label">Link YouTube</label><input type="url" name="landing_video_youtube_url" class="form-control" value="{{ old('landing_video_youtube_url', $settings['landing_video_youtube_url'] ?? '') }}" placeholder="https://www.youtube.com/watch?v=..."><div class="form-text">Mendukung link youtube.com/watch, youtu.be, /embed, dan /shorts.</div></div>
+                <div class="col-12"><label class="form-label">File video</label><input type="file" name="landing_video_file" class="form-control" accept="video/mp4,video/webm,video/ogg,.mp4,.webm,.ogg"><div class="form-text">Format MP4, WebM, atau OGG. Maksimal 100 MB.</div></div>
+                @if (!empty($settings['landing_video_file']))
+                    <div class="col-12"><video controls preload="metadata" class="w-100 rounded" style="max-height:220px" src="{{ str_starts_with($settings['landing_video_file'], 'landing/') ? asset('storage/'.$settings['landing_video_file']) : asset($settings['landing_video_file']) }}"></video></div>
+                @endif
+            </div>
+        </div>
+
+        <div class="content-card mb-4">
+            <div class="section-title"><span class="section-number">08</span><div><h5>Penutup</h5><p>CTA penutup untuk mengarahkan tamu ke RSVP atau halaman pilihan Anda.</p></div></div>
+            <div class="form-check form-switch mb-3"><input type="hidden" name="landing_section_penutup" value="0"><input class="form-check-input" type="checkbox" role="switch" id="landing_section_penutup" name="landing_section_penutup" value="1" @checked(old('landing_section_penutup', $settings['landing_section_penutup'] ?? '1'))><label class="form-check-label" for="landing_section_penutup">Tampilkan section Penutup</label></div>
+            <div class="row g-3">
+                <div class="col-md-6"><label class="form-label">Judul Penutup</label><input name="landing_penutup_title" class="form-control" value="{{ old('landing_penutup_title', $settings['landing_penutup_title'] ?? 'Sampai Jumpa di Hari Bahagia Kami') }}" required></div>
+                <div class="col-md-6"><label class="form-label">Label tombol</label><input name="landing_penutup_button_label" class="form-control" value="{{ old('landing_penutup_button_label', $settings['landing_penutup_button_label'] ?? 'Kirim Ucapan') }}" required></div>
+                <div class="col-12"><label class="form-label">Deskripsi</label><textarea name="landing_penutup_text" class="form-control" rows="3" required>{{ old('landing_penutup_text', $settings['landing_penutup_text'] ?? 'Terima kasih telah menjadi bagian dari cerita dan kebahagiaan kami.') }}</textarea></div>
+                <div class="col-12"><label class="form-label">Link tombol</label><input name="landing_penutup_button_url" class="form-control" value="{{ old('landing_penutup_button_url', $settings['landing_penutup_button_url'] ?? '#rsvp') }}" required></div>
+                <div class="col-6 col-md-3"><img src="{{ $photoUrl($photo('landing_penutup_background', 'Background penutup', 'assets/images/cta/img-1.jpg')) }}" class="w-100 rounded mb-2" style="height:150px;object-fit:cover"><label class="form-label small">Background penutup</label><input type="file" name="landing_penutup_background" class="form-control form-control-sm" accept="image/jpeg,image/png,image/webp"></div>
             </div>
         </div>
 
@@ -634,10 +660,12 @@
                 'CTA': 'cta',
                 'RSVP': 'rsvp',
                 'Cerita': 'story',
+                'Video': 'video',
                 'Acara': 'event',
                 'Jadwal acara': 'schedule',
                 'Keluarga & teman': 'people',
                 'CTA sebelum galeri': 'cta_gallery',
+                'Penutup': 'penutup',
                 'Galeri': 'gallery',
                 'Informasi perjalanan': 'gta',
                 'Gift registration': 'gift',

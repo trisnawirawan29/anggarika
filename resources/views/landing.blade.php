@@ -78,6 +78,9 @@
                             @if ($landing['landing_section_story'])
                             <li><a href="#story">Story</a></li>
                             @endif
+                            @if ($landing['landing_section_video'])
+                            <li><a href="#video">Video</a></li>
+                            @endif
                             @if ($landing['landing_section_event'])
                             <li><a href="#event">Events</a></li>
                             @endif
@@ -640,6 +643,108 @@
         </section>
         <!-- end story-section -->
         @endif
+        @if ($landing['landing_section_video'])
+        <style>
+            .landing-video-section {
+                position: relative;
+                overflow: hidden;
+                background: linear-gradient(135deg, #f5f9fa 0%, #fff 52%, #edf4f5 100%);
+            }
+
+            .landing-video-section::before,
+            .landing-video-section::after {
+                position: absolute;
+                border: 1px solid rgba(111, 155, 173, .2);
+                border-radius: 50%;
+                content: '';
+            }
+
+            .landing-video-section::before {
+                top: -150px;
+                left: -90px;
+                width: 330px;
+                height: 330px;
+            }
+
+            .landing-video-section::after {
+                right: -120px;
+                bottom: -190px;
+                width: 410px;
+                height: 410px;
+            }
+
+            .landing-video-section .container {
+                position: relative;
+                z-index: 1;
+            }
+
+            .landing-video-section .section-title {
+                margin-bottom: 90px;
+            }
+
+            .landing-video-frame {
+                position: relative;
+                overflow: hidden;
+                width: min(100%, 940px);
+                margin: 0 auto;
+                border: 9px solid rgba(255, 255, 255, .82);
+                border-radius: 24px;
+                background: #16242b;
+                box-shadow: 0 28px 60px rgba(56, 92, 105, .2);
+            }
+
+            .landing-video-frame iframe,
+            .landing-video-frame video {
+                display: block;
+                width: 100%;
+                aspect-ratio: 16 / 9;
+                border: 0;
+                object-fit: cover;
+            }
+
+            .landing-video-caption {
+                max-width: 620px;
+                margin: 24px auto 0;
+                color: #607681;
+                font-family: Georgia, serif;
+                font-size: 17px;
+                line-height: 1.8;
+                text-align: center;
+            }
+
+            @media (max-width: 575px) {
+                .landing-video-section .section-title {
+                    margin-bottom: 72px;
+                }
+
+                .landing-video-frame {
+                    border-width: 5px;
+                    border-radius: 16px;
+                }
+
+                .landing-video-caption {
+                    font-size: 15px;
+                }
+            }
+        </style>
+        <section id="video" class="landing-video-section section-padding" data-landing-section="video">
+            <div class="container">
+                <div class="section-title text-center">
+                    <h2>{{ $landing['landing_video_title'] }}</h2>
+                </div>
+                <div class="landing-video-frame">
+                    @if ($landing['landing_video_source'] === 'upload' && $landing['landing_video_file'] !== '')
+                        <video controls preload="metadata" playsinline src="{{ $landing['landing_video_file'] }}"></video>
+                    @elseif ($landing['landing_video_youtube_embed'] !== null)
+                        <iframe src="{{ $landing['landing_video_youtube_embed'] }}?rel=0&amp;modestbranding=1" title="{{ $landing['landing_video_title'] }}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                    @else
+                        <div style="display:flex;align-items:center;justify-content:center;min-height:320px;padding:30px;color:#fff;text-align:center">Video belum tersedia.</div>
+                    @endif
+                </div>
+                <p class="landing-video-caption">Saksikan kembali momen-momen penuh cinta dan kebahagiaan kami.</p>
+            </div>
+        </section>
+        @endif
         @if ($landing['landing_section_cta'])
         <style>
             .cta-area .cta-title {
@@ -1177,6 +1282,81 @@
                 </div>
             </div>
         </div>
+        @endif
+        @if ($landing['landing_section_penutup'])
+        <style>
+            .penutup-area {
+                position: relative;
+                overflow: hidden;
+                width: 100%;
+                background-image: linear-gradient(135deg, rgba(48, 81, 94, .94), rgba(111, 155, 173, .9)), url('{{ $landing['landing_penutup_background'] }}');
+                background-position: center;
+                background-size: cover;
+            }
+
+            .penutup-area > .container {
+                width: 100%;
+                max-width: none;
+            }
+
+            .penutup-area .penutup-frame {
+                position: relative;
+                max-width: 900px;
+                margin: 0 auto;
+                padding: clamp(20px, 3vw, 40px) clamp(22px, 6vw, 72px);
+                background: transparent;
+            }
+
+            .penutup-area .cta-content {
+                position: relative;
+                z-index: 1;
+                padding: 0;
+            }
+
+            .penutup-area .penutup-kicker {
+                margin-bottom: 14px;
+                color: rgba(255, 255, 255, .78);
+                font-size: 12px;
+                font-weight: 700;
+                letter-spacing: .24em;
+                text-transform: uppercase;
+            }
+
+            .penutup-area .penutup-button {
+                display: inline-block;
+                margin-top: 10px;
+                padding: 14px 30px;
+                border: 0;
+                border-radius: 999px;
+                background: rgba(255, 255, 255, .14);
+                color: #fff;
+                font-weight: 700;
+                letter-spacing: .04em;
+                transition: .25s ease;
+            }
+
+            .penutup-area .penutup-button:hover {
+                background: #fff;
+                color: #527487;
+                transform: translateY(-3px);
+            }
+        </style>
+        <section class="cta-area penutup-area" data-landing-section="penutup">
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="penutup-frame">
+                            <div class="cta-content">
+                                <p class="penutup-kicker">Sebuah penutup dari kami</p>
+                                <h2>{{ $landing['landing_penutup_title'] }}</h2>
+                                <p style="font-family: Georgia, serif; white-space: pre-line;">{{ $landing['landing_penutup_text'] }}</p>
+                                <a class="penutup-button go-rsvp-area" href="{{ $landing['landing_penutup_button_url'] }}">{{ $landing['landing_penutup_button_label'] }}</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
         @endif
         @if ($landing['landing_section_gallery'])
         <!--Start project area-->  

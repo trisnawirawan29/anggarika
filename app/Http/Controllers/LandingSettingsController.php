@@ -19,7 +19,7 @@ class LandingSettingsController extends Controller
 {
     /** @var list<string> */
     private const LANDING_SECTION_ORDER = [
-        'hero', 'couple', 'countdown', 'story', 'cta', 'event', 'schedule', 'people', 'cta_gallery',
+        'hero', 'couple', 'countdown', 'story', 'video', 'cta', 'event', 'schedule', 'people', 'cta_gallery', 'penutup',
         'gallery', 'rsvp', 'gta', 'gift', 'footer', 'music',
     ];
 
@@ -31,10 +31,12 @@ class LandingSettingsController extends Controller
         'landing_event_photo_1', 'landing_event_photo_2', 'landing_event_photo_3', 'landing_event_photo_4',
         'landing_gallery_photo_1', 'landing_gallery_photo_2', 'landing_gallery_photo_3',
         'landing_gallery_photo_4', 'landing_gallery_photo_5', 'landing_gallery_photo_6',
-        'landing_countdown_background', 'landing_cta_background', 'landing_cta_gallery_background', 'landing_rsvp_background', 'landing_footer_background',
+        'landing_countdown_background', 'landing_cta_background', 'landing_cta_gallery_background', 'landing_penutup_background', 'landing_rsvp_background', 'landing_footer_background',
     ];
 
     private const LANDING_AUDIO_KEYS = ['landing_music_file'];
+
+    private const LANDING_VIDEO_KEYS = ['landing_video_file'];
 
     public function edit(Request $request): View
     {
@@ -102,6 +104,10 @@ class LandingSettingsController extends Controller
             'landing_groom_name_font_size' => ['required', 'integer', 'between:16,96'],
             'landing_groom_name_font_family' => ['required', Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace'])],
             'landing_story_title' => ['required', 'string', 'max:120'],
+            'landing_video_title' => ['required', 'string', 'max:120'],
+            'landing_video_source' => ['required', Rule::in(['upload', 'youtube'])],
+            'landing_video_youtube_url' => ['nullable', 'url', 'max:2048'],
+            'landing_video_file' => ['nullable', 'file', 'mimes:mp4,webm,ogg', 'max:102400'],
             'landing_cta_title' => ['required', 'string', 'max:120'],
             'landing_cta_title_font_size' => ['required', 'integer', 'between:16,96'],
             'landing_cta_title_font_family' => ['required', Rule::in(['inherit', 'Arial, sans-serif', 'Georgia, serif', 'Trebuchet MS, sans-serif', 'Courier New, monospace'])],
@@ -141,6 +147,8 @@ class LandingSettingsController extends Controller
             'landing_section_couple' => ['required', 'boolean'],
             'landing_section_countdown' => ['required', 'boolean'],
             'landing_section_story' => ['required', 'boolean'],
+            'landing_section_video' => ['required', 'boolean'],
+            'landing_section_penutup' => ['required', 'boolean'],
             'landing_story_1_enabled' => ['required', 'boolean'],
             'landing_story_2_enabled' => ['required', 'boolean'],
             'landing_story_3_enabled' => ['required', 'boolean'],
@@ -187,6 +195,17 @@ class LandingSettingsController extends Controller
             ],
             'story' => [
                 'landing_story_title' => ['type' => 'string', 'max' => 120],
+            ],
+            'video' => [
+                'landing_video_title' => ['type' => 'string', 'max' => 120],
+                'landing_video_source' => ['type' => 'string', 'max' => 20],
+                'landing_video_youtube_url' => ['type' => 'url', 'max' => 2048],
+            ],
+            'penutup' => [
+                'landing_penutup_title' => ['type' => 'string', 'max' => 120],
+                'landing_penutup_text' => ['type' => 'string', 'max' => 1000],
+                'landing_penutup_button_label' => ['type' => 'string', 'max' => 80],
+                'landing_penutup_button_url' => ['type' => 'string', 'max' => 2048],
             ],
             'cta' => [
                 'landing_cta_title' => ['type' => 'string', 'max' => 120],
@@ -251,6 +270,13 @@ class LandingSettingsController extends Controller
                 ];
             }
         }
+
+        $rules['landing_video_youtube_url'] = [
+            Rule::requiredIf($request->boolean('landing_section_video') && $request->input('landing_video_source') === 'youtube'),
+            'nullable',
+            'url',
+            'max:2048',
+        ];
 
         $rules['landing_gallery_columns'] = [
             Rule::requiredIf($request->boolean('landing_section_gallery')),
@@ -413,6 +439,8 @@ class LandingSettingsController extends Controller
                     'landing_story_photo_'.$number,
                 ], range(1, 4)),
             )],
+            'video' => ['landing_section_video', 'landing_video_title', 'landing_video_source', 'landing_video_youtube_url', 'landing_video_file'],
+            'penutup' => ['landing_section_penutup', 'landing_penutup_title', 'landing_penutup_text', 'landing_penutup_button_label', 'landing_penutup_button_url', 'landing_penutup_background'],
             'event' => ['landing_section_event', 'landing_event_title', ...array_merge(
                 ...array_map(fn (int $number): array => [
                     'landing_event_'.$number.'_enabled',
@@ -473,7 +501,7 @@ class LandingSettingsController extends Controller
             $data[$key] = $newPhoto;
         }
 
-        foreach (self::LANDING_AUDIO_KEYS as $key) {
+        foreach ([...self::LANDING_AUDIO_KEYS, ...self::LANDING_VIDEO_KEYS] as $key) {
             if (! $request->hasFile($key)) {
                 unset($data[$key]);
 
@@ -481,11 +509,11 @@ class LandingSettingsController extends Controller
             }
 
             $oldAudio = Setting::value($key);
-            $newAudio = $request->file($key)->store('landing', 'public');
+            $newMedia = $request->file($key)->store('landing', 'public');
             if (is_string($oldAudio) && str_starts_with($oldAudio, 'landing/')) {
                 Storage::disk('public')->delete($oldAudio);
             }
-            $data[$key] = $newAudio;
+            $data[$key] = $newMedia;
         }
 
         foreach ($data as $key => $value) {
@@ -521,11 +549,14 @@ class LandingSettingsController extends Controller
     {
         $key = $request->string('photo_key')->toString();
         $isAudio = in_array($key, self::LANDING_AUDIO_KEYS, true);
+        $isVideo = in_array($key, self::LANDING_VIDEO_KEYS, true);
         $data = $request->validate([
-            'photo_key' => ['required', Rule::in([...self::LANDING_PHOTO_KEYS, ...self::LANDING_AUDIO_KEYS])],
+            'photo_key' => ['required', Rule::in([...self::LANDING_PHOTO_KEYS, ...self::LANDING_AUDIO_KEYS, ...self::LANDING_VIDEO_KEYS])],
             'photo' => $isAudio
                 ? ['required', 'file', 'mimes:mp3', 'max:10240']
-                : ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+                : ($isVideo
+                    ? ['required', 'file', 'mimes:mp4,webm,ogg', 'max:102400']
+                    : ['required', 'image', 'mimes:jpg,jpeg,png,webp', 'max:2048']),
         ]);
 
         $oldPhoto = Setting::value($data['photo_key']);
