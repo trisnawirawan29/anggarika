@@ -41,6 +41,14 @@ class LandingSettingsController extends Controller
     public function edit(Request $request): View
     {
         $settings = Setting::query()->pluck('value', 'key');
+        $giftAccounts = json_decode((string) $settings->get('landing_gift_accounts'), true);
+        if (! is_array($giftAccounts) || $giftAccounts === []) {
+            $giftAccounts = [[
+                'bank_name' => $settings->get('landing_gift_bank_name', 'Bank BCA'),
+                'account_number' => $settings->get('landing_gift_account_number', '1234567890'),
+                'account_holder' => $settings->get('landing_gift_account_holder', 'Millar & Aliza'),
+            ]];
+        }
         $settings['landing_guest_greeting'] ??= 'Kepada Yth.';
         $settings['landing_guest_apology'] ??= 'Mohon maaf apabila ada kesalahan penulisan nama/alamat.';
         $settings['landing_guest_message_template'] ??= "Halo {{nama}},\n\nKami mengundang Anda untuk hadir di acara pernikahan kami.\n\nBuka undangan: {{link}}";
@@ -61,7 +69,7 @@ class LandingSettingsController extends Controller
             ->latest()
             ->get();
 
-        return view('admin.landing-settings', compact('settings', 'sectionOrder', 'galleryItems', 'rsvpMessages', 'rsvpMessageSearch'));
+        return view('admin.landing-settings', compact('settings', 'sectionOrder', 'galleryItems', 'rsvpMessages', 'rsvpMessageSearch', 'giftAccounts'));
     }
 
     public function update(Request $request): RedirectResponse
@@ -83,6 +91,25 @@ class LandingSettingsController extends Controller
             AuditLogger::record('landing_settings.updated', 'Format pesan WhatsApp diperbarui.', null, [], ['keys' => array_keys($data)]);
 
             return back()->with('success', 'Format pesan WhatsApp berhasil disimpan.');
+        }
+
+        if ($selectedSection === 'gift') {
+            $giftAccounts = $request->input('landing_gift_accounts');
+            if (! is_array($giftAccounts) || $giftAccounts === []) {
+                $giftAccounts = [[
+                    'bank_name' => $request->input('landing_gift_bank_name'),
+                    'account_number' => $request->input('landing_gift_account_number'),
+                    'account_holder' => $request->input('landing_gift_account_holder'),
+                ]];
+            }
+
+            $firstAccount = $giftAccounts[0];
+            $request->merge([
+                'landing_gift_accounts' => $giftAccounts,
+                'landing_gift_bank_name' => $firstAccount['bank_name'] ?? null,
+                'landing_gift_account_number' => $firstAccount['account_number'] ?? null,
+                'landing_gift_account_holder' => $firstAccount['account_holder'] ?? null,
+            ]);
         }
 
         $rules = [
@@ -140,6 +167,10 @@ class LandingSettingsController extends Controller
             'landing_gift_bank_name' => ['required', 'string', 'max:80'],
             'landing_gift_account_number' => ['required', 'string', 'max:40'],
             'landing_gift_account_holder' => ['required', 'string', 'max:120'],
+            'landing_gift_accounts' => ['required', 'array', 'min:1', 'max:12'],
+            'landing_gift_accounts.*.bank_name' => ['required', 'string', 'max:80'],
+            'landing_gift_accounts.*.account_number' => ['required', 'string', 'max:40'],
+            'landing_gift_accounts.*.account_holder' => ['required', 'string', 'max:120'],
             'landing_rsvp_title' => ['required', 'string', 'max:120'],
             'landing_footer_title' => ['required', 'string', 'max:120'],
             'landing_footer_description' => ['required', 'string', 'max:1000'],
@@ -470,7 +501,7 @@ class LandingSettingsController extends Controller
             'cta_gallery' => ['landing_section_cta_gallery', 'landing_cta_gallery_title', 'landing_cta_gallery_text', 'landing_cta_gallery_background_transparency', 'landing_cta_gallery_rsvp_label', 'landing_cta_gallery_rsvp_url', 'landing_cta_gallery_location_label', 'landing_cta_gallery_location_url', 'landing_cta_gallery_rsvp_enabled', 'landing_cta_gallery_location_enabled', 'landing_cta_gallery_background'],
             'gallery' => ['landing_section_gallery', 'landing_gallery_title', 'landing_gallery_columns', ...array_map(fn (int $number): string => 'landing_gallery_photo_'.$number, range(1, 6))],
             'gta' => ['landing_section_gta'],
-            'gift' => ['landing_section_gift', 'landing_gift_title', 'landing_gift_description', 'landing_gift_bank_name', 'landing_gift_account_number', 'landing_gift_account_holder'],
+            'gift' => ['landing_section_gift', 'landing_gift_title', 'landing_gift_description', 'landing_gift_bank_name', 'landing_gift_account_number', 'landing_gift_account_holder', 'landing_gift_accounts'],
             'music' => ['landing_section_music', 'landing_music_file'],
             'footer' => ['landing_section_footer', 'landing_footer_title', 'landing_footer_description', 'landing_footer_description_font_size', 'landing_footer_description_font_family', 'landing_footer_background'],
             'order' => ['landing_section_order'],
@@ -486,6 +517,10 @@ class LandingSettingsController extends Controller
                     'landing_section_order' => 'Urutan section tidak valid.',
                 ]);
             }
+        }
+
+        if ($section === 'gift') {
+            $data['landing_gift_accounts'] = json_encode($data['landing_gift_accounts'], JSON_THROW_ON_ERROR);
         }
 
         foreach (self::LANDING_PHOTO_KEYS as $key) {

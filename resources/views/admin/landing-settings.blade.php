@@ -473,9 +473,24 @@
             <div class="row g-3">
                 <div class="col-12"><label class="form-label">Judul section gift</label><input name="landing_gift_title" class="form-control" value="{{ old('landing_gift_title', $settings['landing_gift_title'] ?? 'Gift Registration') }}" required></div>
                 <div class="col-12"><label class="form-label">Deskripsi gift</label><textarea name="landing_gift_description" class="form-control" rows="3" required>{{ old('landing_gift_description', $settings['landing_gift_description'] ?? 'Your presence is the greatest gift. If you would like to send a wedding gift, you may use the account details below.') }}</textarea></div>
-                <div class="col-md-4"><label class="form-label">Nama bank</label><input name="landing_gift_bank_name" class="form-control" value="{{ old('landing_gift_bank_name', $settings['landing_gift_bank_name'] ?? 'Bank BCA') }}" required></div>
-                <div class="col-md-4"><label class="form-label">Nomor rekening</label><input name="landing_gift_account_number" class="form-control" value="{{ old('landing_gift_account_number', $settings['landing_gift_account_number'] ?? '1234567890') }}" required></div>
-                <div class="col-md-4"><label class="form-label">Atas nama</label><input name="landing_gift_account_holder" class="form-control" value="{{ old('landing_gift_account_holder', $settings['landing_gift_account_holder'] ?? 'Millar & Aliza') }}" required></div>
+                <div class="col-12">
+                    <div class="d-flex align-items-center justify-content-between gap-3 mb-2">
+                        <div><label class="form-label mb-0">Daftar rekening</label><div class="form-text">Tambahkan satu atau beberapa rekening yang akan tampil di undangan.</div></div>
+                        <button type="button" class="btn btn-outline-primary btn-sm" id="add-gift-account"><i class="fas fa-plus me-1"></i>Tambah rekening</button>
+                    </div>
+                    <div id="gift-accounts-list">
+                        @foreach ($giftAccounts as $accountIndex => $account)
+                            <div class="gift-account-fields border rounded p-3 mb-3" data-account-index="{{ $accountIndex }}">
+                                <div class="d-flex justify-content-between align-items-center mb-3"><strong>Rekening <span class="gift-account-number-label">{{ $accountIndex + 1 }}</span></strong><button type="button" class="btn btn-outline-danger btn-sm remove-gift-account" @disabled(count($giftAccounts) === 1)><i class="fas fa-trash me-1"></i>Hapus</button></div>
+                                <div class="row g-3">
+                                    <div class="col-md-4"><label class="form-label">Nama bank</label><input name="landing_gift_accounts[{{ $accountIndex }}][bank_name]" class="form-control" value="{{ old('landing_gift_accounts.'.$accountIndex.'.bank_name', $account['bank_name'] ?? '') }}" required></div>
+                                    <div class="col-md-4"><label class="form-label">Nomor rekening</label><input name="landing_gift_accounts[{{ $accountIndex }}][account_number]" class="form-control" value="{{ old('landing_gift_accounts.'.$accountIndex.'.account_number', $account['account_number'] ?? '') }}" required></div>
+                                    <div class="col-md-4"><label class="form-label">Atas nama</label><input name="landing_gift_accounts[{{ $accountIndex }}][account_holder]" class="form-control" value="{{ old('landing_gift_accounts.'.$accountIndex.'.account_holder', $account['account_holder'] ?? '') }}" required></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -944,6 +959,56 @@
                 window.alert(error.message || 'Upload foto gagal.');
             }
         });
+    })();
+</script>
+<script>
+    (() => {
+        const list = document.querySelector('#gift-accounts-list');
+        const addButton = document.querySelector('#add-gift-account');
+        if (!list || !addButton) {
+            return;
+        }
+
+        const syncGiftAccounts = () => {
+            const cards = [...list.querySelectorAll('.gift-account-fields')];
+            cards.forEach((card, index) => {
+                card.dataset.accountIndex = String(index);
+                card.querySelector('.gift-account-number-label').textContent = String(index + 1);
+                card.querySelector('.remove-gift-account').disabled = cards.length === 1;
+                card.querySelectorAll('input').forEach((input) => {
+                    const field = input.name.match(/\[([^\]]+)\]$/)?.[1];
+                    if (field) {
+                        input.name = `landing_gift_accounts[${index}][${field}]`;
+                    }
+                });
+            });
+            addButton.disabled = cards.length >= 12;
+        };
+
+        addButton.addEventListener('click', () => {
+            const index = list.querySelectorAll('.gift-account-fields').length;
+            if (index >= 12) {
+                return;
+            }
+
+            const card = document.createElement('div');
+            card.className = 'gift-account-fields border rounded p-3 mb-3';
+            card.innerHTML = `<div class="d-flex justify-content-between align-items-center mb-3"><strong>Rekening <span class="gift-account-number-label">${index + 1}</span></strong><button type="button" class="btn btn-outline-danger btn-sm remove-gift-account"><i class="fas fa-trash me-1"></i>Hapus</button></div><div class="row g-3"><div class="col-md-4"><label class="form-label">Nama bank</label><input name="landing_gift_accounts[${index}][bank_name]" class="form-control" required></div><div class="col-md-4"><label class="form-label">Nomor rekening</label><input name="landing_gift_accounts[${index}][account_number]" class="form-control" required></div><div class="col-md-4"><label class="form-label">Atas nama</label><input name="landing_gift_accounts[${index}][account_holder]" class="form-control" required></div></div>`;
+            list.appendChild(card);
+            syncGiftAccounts();
+        });
+
+        list.addEventListener('click', (event) => {
+            const removeButton = event.target.closest('.remove-gift-account');
+            if (!removeButton || list.querySelectorAll('.gift-account-fields').length === 1) {
+                return;
+            }
+
+            removeButton.closest('.gift-account-fields').remove();
+            syncGiftAccounts();
+        });
+
+        syncGiftAccounts();
     })();
 </script>
 @endsection

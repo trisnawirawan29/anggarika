@@ -314,6 +314,36 @@ class LandingSectionOrderTest extends TestCase
         $this->assertStringContainsString('Angga &amp; Rika', $content);
     }
 
+    public function test_admin_can_configure_multiple_gift_registration_accounts(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'gift',
+                'landing_section_gift' => '1',
+                'landing_gift_title' => 'Hadiah Pernikahan',
+                'landing_gift_description' => 'Terima kasih atas perhatian dan doa Anda.',
+                'landing_gift_accounts' => [
+                    ['bank_name' => 'Bank Mandiri', 'account_number' => '9876543210', 'account_holder' => 'Angga & Rika'],
+                    ['bank_name' => 'Bank BCA', 'account_number' => '1234567890', 'account_holder' => 'Rika & Angga'],
+                ],
+            ])
+            ->assertRedirect();
+
+        $this->assertSame([
+            ['bank_name' => 'Bank Mandiri', 'account_number' => '9876543210', 'account_holder' => 'Angga & Rika'],
+            ['bank_name' => 'Bank BCA', 'account_number' => '1234567890', 'account_holder' => 'Rika & Angga'],
+        ], json_decode((string) Setting::value('landing_gift_accounts'), true));
+
+        $content = $this->get(route('landing'))->assertOk()->getContent();
+
+        $this->assertStringContainsString('9876543210', $content);
+        $this->assertStringContainsString('1234567890', $content);
+        $this->assertSame(2, substr_count($content, 'gift-card"'));
+    }
+
     public function test_guest_can_submit_rsvp_message_and_latest_messages_are_displayed_first(): void
     {
         RsvpMessage::query()->create(['name' => 'Pesan Lama', 'message' => 'Ucapan lama.']);

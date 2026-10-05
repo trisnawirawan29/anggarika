@@ -1886,7 +1886,19 @@
 
             .gift-registration-modern .gift-card-wrap {
                 display: flex;
+                flex-wrap: wrap;
+                gap: 28px;
                 justify-content: center;
+            }
+
+            @media (min-width: 576px) {
+                .gift-registration-modern .gift-card-wrap {
+                    flex-wrap: nowrap;
+                }
+
+                .gift-registration-modern .gift-card {
+                    flex: 1 1 0;
+                }
             }
 
             .gift-registration-modern .gift-card {
@@ -1992,6 +2004,11 @@
             }
 
             @media (max-width: 575px) {
+                .gift-registration-modern .gift-card-wrap {
+                    flex-direction: column;
+                    gap: 20px;
+                }
+
                 .gift-registration-modern .section-title {
                     margin-bottom: 60px;
                 }
@@ -2023,21 +2040,23 @@
                     <p class="gift-description">{{ $landing['landing_gift_description'] }}</p>
                 </div>
                 <div class="gift-card-wrap">
+                    @foreach ($landing['landing_gift_accounts'] as $giftAccount)
                     <article class="gift-card" aria-label="Informasi rekening hadiah">
                         <div class="gift-card-top">
-                            <span class="gift-bank-name">{{ $landing['landing_gift_bank_name'] }}</span>
+                            <span class="gift-bank-name">{{ $giftAccount['bank_name'] }}</span>
                             <span class="gift-card-type">Wedding Gift</span>
                         </div>
                         <div class="gift-chip" aria-hidden="true"></div>
-                        <p class="gift-account-number">{{ $landing['landing_gift_account_number'] }}</p>
+                        <p class="gift-account-number">{{ $giftAccount['account_number'] }}</p>
                         <div class="gift-card-bottom">
                             <div>
                                 <span class="gift-card-label">Atas nama</span>
-                                <span class="gift-account-holder">{{ $landing['landing_gift_account_holder'] }}</span>
+                                <span class="gift-account-holder">{{ $giftAccount['account_holder'] }}</span>
                             </div>
                             <span class="gift-contactless" aria-hidden="true">)))</span>
                         </div>
                     </article>
+                    @endforeach
                 </div>
             </div>
         </div>

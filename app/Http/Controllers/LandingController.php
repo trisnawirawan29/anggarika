@@ -167,6 +167,11 @@ class LandingController extends Controller
             'landing_gift_bank_name' => 'Bank BCA',
             'landing_gift_account_number' => '1234567890',
             'landing_gift_account_holder' => 'Millar & Aliza',
+            'landing_gift_accounts' => json_encode([[
+                'bank_name' => 'Bank BCA',
+                'account_number' => '1234567890',
+                'account_holder' => 'Millar & Aliza',
+            ]]),
             'landing_rsvp_title' => 'Be Our RSVP',
             'landing_footer_title' => 'Millar & Aliza Forever',
             'landing_footer_description' => 'Thank you for being part of our special day.',
@@ -229,6 +234,15 @@ class LandingController extends Controller
             fn (bool $default, string $key): array => [$key => filter_var($settings->get($key, $default), FILTER_VALIDATE_BOOLEAN)]
         );
         $landing = $landing->merge($sections);
+        $giftAccounts = json_decode((string) $landing['landing_gift_accounts'], true);
+        if (! is_array($giftAccounts) || $giftAccounts === []) {
+            $giftAccounts = [[
+                'bank_name' => $landing['landing_gift_bank_name'],
+                'account_number' => $landing['landing_gift_account_number'],
+                'account_holder' => $landing['landing_gift_account_holder'],
+            ]];
+        }
+        $landing['landing_gift_accounts'] = $giftAccounts;
         $sectionOrder = json_decode((string) $settings->get('landing_section_order'), true);
         $landing['landing_section_order'] = is_array($sectionOrder)
             && count($sectionOrder) === count(self::LANDING_SECTION_ORDER)
