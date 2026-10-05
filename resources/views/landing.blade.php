@@ -1264,7 +1264,12 @@
         <!-- groomsmen-bridesmaid-area start -->
         @endif
         @if ($landing['landing_section_cta_gallery'])
-        <div class="cta-area" data-landing-section="cta_gallery" style="background-image: url('{{ $landing['landing_cta_gallery_background'] }}');">
+        <style>
+            .cta-area[data-landing-section="cta_gallery"]:before {
+                opacity: var(--cta-gallery-overlay-opacity);
+            }
+        </style>
+        <div class="cta-area" data-landing-section="cta_gallery" style="--cta-gallery-overlay-opacity: {{ 1 - ((int) $landing['landing_cta_gallery_background_transparency'] / 100) }};background-image: url('{{ $landing['landing_cta_gallery_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">
@@ -1292,6 +1297,10 @@
                 background-image: linear-gradient(135deg, rgba(48, 81, 94, .94), rgba(111, 155, 173, .9)), url('{{ $landing['landing_penutup_background'] }}');
                 background-position: center;
                 background-size: cover;
+            }
+
+            .penutup-area:before {
+                opacity: var(--penutup-overlay-opacity);
             }
 
             .penutup-area > .container {
@@ -1341,7 +1350,7 @@
                 transform: translateY(-3px);
             }
         </style>
-        <section class="cta-area penutup-area" data-landing-section="penutup">
+        <section class="cta-area penutup-area" data-landing-section="penutup" style="--penutup-overlay-opacity: {{ 1 - ((int) $landing['landing_penutup_background_transparency'] / 100) }};">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">

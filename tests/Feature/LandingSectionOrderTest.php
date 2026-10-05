@@ -144,18 +144,13 @@ class LandingSectionOrderTest extends TestCase
             ->assertSee('--gallery-columns: 3;', false);
     }
 
-<<<<<<< HEAD
     public function test_admin_can_configure_cta_background_transparency(): void
-=======
-    public function test_admin_can_configure_penutup_section(): void
->>>>>>> 67d0f22ef28e8efc895704ec35862c2c1b74f2d7
     {
         $adminRole = Role::where('slug', 'admin')->firstOrFail();
         $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
 
         $this->actingAs($admin)
             ->put(route('admin.landing-settings.update'), [
-<<<<<<< HEAD
                 'save_section' => 'cta',
                 'landing_section_cta' => '1',
                 'landing_cta_title' => 'Hari bahagia kami',
@@ -171,30 +166,83 @@ class LandingSectionOrderTest extends TestCase
                 'landing_cta_rsvp_url' => '',
                 'landing_cta_location_label' => '',
                 'landing_cta_location_url' => '',
-=======
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        $this->assertSame('65', Setting::value('landing_cta_background_transparency'));
+        $this->get(route('landing'))
+            ->assertOk()
+            ->assertSee('--cta-overlay-opacity: 0.35;', false);
+    }
+
+    public function test_admin_can_configure_penutup_section(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
                 'save_section' => 'penutup',
                 'landing_section_penutup' => '1',
                 'landing_penutup_title' => 'Sampai Jumpa',
                 'landing_penutup_text' => 'Terima kasih atas kehadiran Anda.',
                 'landing_penutup_button_label' => 'Kirim ucapan',
                 'landing_penutup_button_url' => '#rsvp',
->>>>>>> 67d0f22ef28e8efc895704ec35862c2c1b74f2d7
+                'landing_penutup_background_transparency' => '20',
             ])
             ->assertRedirect()
             ->assertSessionDoesntHaveErrors();
 
-<<<<<<< HEAD
-        $this->assertSame('65', Setting::value('landing_cta_background_transparency'));
-        $this->get(route('landing'))
-            ->assertOk()
-            ->assertSee('--cta-overlay-opacity: 0.35;', false);
-=======
         $this->assertSame('Sampai Jumpa', Setting::value('landing_penutup_title'));
         $this->get(route('landing'))
             ->assertSee('Sampai Jumpa')
             ->assertSee('Terima kasih atas kehadiran Anda.')
             ->assertSee('data-landing-section="penutup"', false);
->>>>>>> 67d0f22ef28e8efc895704ec35862c2c1b74f2d7
+    }
+
+    public function test_admin_can_configure_gallery_cta_and_penutup_background_transparency(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'cta_gallery',
+                'landing_section_cta_gallery' => '1',
+                'landing_cta_gallery_title' => 'CTA galeri',
+                'landing_cta_gallery_text' => 'Lihat momen kami.',
+                'landing_cta_gallery_background_transparency' => '45',
+                'landing_cta_gallery_rsvp_enabled' => '0',
+                'landing_cta_gallery_location_enabled' => '0',
+                'landing_cta_gallery_rsvp_label' => '',
+                'landing_cta_gallery_rsvp_url' => '',
+                'landing_cta_gallery_location_label' => '',
+                'landing_cta_gallery_location_url' => '',
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'penutup',
+                'landing_section_penutup' => '1',
+                'landing_penutup_title' => 'Sampai jumpa',
+                'landing_penutup_text' => 'Terima kasih.',
+                'landing_penutup_button_label' => 'Kirim ucapan',
+                'landing_penutup_button_url' => '#rsvp',
+                'landing_penutup_background_transparency' => '70',
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        $this->assertSame('45', Setting::value('landing_cta_gallery_background_transparency'));
+        $this->assertSame('70', Setting::value('landing_penutup_background_transparency'));
+
+        $this->get(route('landing'))
+            ->assertOk()
+            ->assertSee('--cta-gallery-overlay-opacity: 0.55;', false)
+            ->assertSee('--penutup-overlay-opacity: 0.3;', false);
     }
 
     public function test_admin_can_configure_each_event_and_hide_disabled_events(): void
