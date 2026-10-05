@@ -129,7 +129,7 @@
                 margin: 4px 0;
                 color: #fff;
                 font-size: clamp(26px, 4vw, 42px);
-                font-family: 'Great Vibes', cursive;
+                font-family: Georgia, serif;
             }
         </style>
         <!-- start of hero -->
