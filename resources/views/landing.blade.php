@@ -650,6 +650,10 @@
                 font-size: var(--cta-description-size) !important;
             }
 
+            .cta-area[data-landing-section="cta"]:before {
+                opacity: var(--cta-overlay-opacity);
+            }
+
             @media (max-width: 767px) {
                 .cta-area {
                     background-attachment: scroll;
@@ -668,7 +672,7 @@
             }
         </style>
         <!-- cta area start-->
-        <div class="cta-area" data-landing-section="cta" style="background-image: url('{{ $landing['landing_cta_background'] }}');">
+        <div class="cta-area" data-landing-section="cta" style="--cta-overlay-opacity: {{ 1 - ((int) $landing['landing_cta_background_transparency'] / 100) }};background-image: url('{{ $landing['landing_cta_background'] }}');">
             <div class="container">
                 <div class="row">
                     <div class="col-lg-12">

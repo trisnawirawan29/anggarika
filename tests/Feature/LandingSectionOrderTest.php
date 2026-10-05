@@ -101,6 +101,38 @@ class LandingSectionOrderTest extends TestCase
             ->assertSee('--gallery-columns: 3;', false);
     }
 
+    public function test_admin_can_configure_cta_background_transparency(): void
+    {
+        $adminRole = Role::where('slug', 'admin')->firstOrFail();
+        $admin = User::factory()->create(['role' => 'admin', 'role_id' => $adminRole->id]);
+
+        $this->actingAs($admin)
+            ->put(route('admin.landing-settings.update'), [
+                'save_section' => 'cta',
+                'landing_section_cta' => '1',
+                'landing_cta_title' => 'Hari bahagia kami',
+                'landing_cta_title_font_size' => '42',
+                'landing_cta_title_font_family' => 'inherit',
+                'landing_cta_text' => 'Sampai jumpa di acara kami.',
+                'landing_cta_text_font_size' => '16',
+                'landing_cta_text_font_family' => 'inherit',
+                'landing_cta_background_transparency' => '65',
+                'landing_cta_rsvp_enabled' => '0',
+                'landing_cta_location_enabled' => '0',
+                'landing_cta_rsvp_label' => '',
+                'landing_cta_rsvp_url' => '',
+                'landing_cta_location_label' => '',
+                'landing_cta_location_url' => '',
+            ])
+            ->assertRedirect()
+            ->assertSessionDoesntHaveErrors();
+
+        $this->assertSame('65', Setting::value('landing_cta_background_transparency'));
+        $this->get(route('landing'))
+            ->assertOk()
+            ->assertSee('--cta-overlay-opacity: 0.35;', false);
+    }
+
     public function test_admin_can_configure_each_event_and_hide_disabled_events(): void
     {
         $adminRole = Role::where('slug', 'admin')->firstOrFail();
